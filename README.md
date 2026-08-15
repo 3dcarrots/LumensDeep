@@ -4,6 +4,7 @@
 [![PySide6 / Qt6](https://img.shields.io/badge/GUI-PySide6%20%2F%20Qt6-green.svg)](https://pypi.org/project/PySide6/)
 [![ModernGL](https://img.shields.io/badge/GPU-ModernGL%20%2F%20OpenGL%203.3+-orange.svg)](https://github.com/moderngl/moderngl)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Website](https://img.shields.io/badge/Website-lumensdeep.com-00d2ff.svg)](https://lumensdeep.com/)
 [![Architecture: Clean Modular](https://img.shields.io/badge/Architecture-Clean%20Modular%20Plugins-purple.svg)](docs/ARCHITECTURE.md)
 
 <!-- SCREENSHOT PLACEHOLDER: docs/images/hero_preview.png -->
@@ -11,6 +12,8 @@
 > *Description: Full aesthetic screenshot of Lumens Deep running with an open high-res RAW portrait/landscape, active filmstrip, layers panel, and color grading in progress.*
 
 **Lumens Deep** is an open-source, non-destructive 32-bit floating-point RAW photo editor and 3D neural relighting studio built with **Python**, **ModernGL**, and **PySide6**. It combines modern computational photography, high-performance GPU shaders, neural 3D scene estimation (Depth, Surface Normals, Alpha Matting), and an extensible plugin architecture.
+
+🌐 **Official Website:** [https://lumensdeep.com](https://lumensdeep.com/)
 
 ---
 
@@ -177,6 +180,7 @@ See full list in [Keyboard Shortcuts Reference](docs/SHORTCUTS.md).
 
 ## 📚 Documentation Index
 
+- 🌐 **[Official Website & Interactive Demos](https://lumensdeep.com)**: Interactive Before/After split viewer, 3D map explorer, and live Bokeh aperture visualizer.
 - 📖 **[User Guide & Manual](docs/USER_GUIDE.md)**: Full guide covering all features and workflows.
 - 📐 **[Software Architecture & Plugin Guide](docs/ARCHITECTURE.md)**: Deep dive into the engine, FBO pipeline, and plugin API.
 - ⌨️ **[Keyboard Shortcuts Cheat Sheet](docs/SHORTCUTS.md)**: Quick reference table for all shortcuts.

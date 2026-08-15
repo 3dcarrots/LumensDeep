@@ -1,0 +1,43 @@
+# Python Bytecode & Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+
+# Environment Variables & Keys
+.env
+.env.local
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary scratch & test artifacts
+scratch/*.png
+scratch/*.jpg
+scratch/*.tif
+scratch/*.tiff
+scratch/*.json
+
+# Large model weights (if downloaded externally)
+*.onnx
+*.tflite
+!blaze_face.tflite
+*.pth
+*.pt
+*.bin
+*.ckpt
+
+# Operating System files
+Thumbs.db
+Desktop.ini
+.DS_Store

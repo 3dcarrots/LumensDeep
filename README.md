@@ -7,9 +7,7 @@
 [![Website](https://img.shields.io/badge/Website-lumensdeep.com-00d2ff.svg)](https://lumensdeep.com/)
 [![Architecture: Clean Modular](https://img.shields.io/badge/Architecture-Clean%20Modular%20Plugins-purple.svg)](docs/ARCHITECTURE.md)
 
-<!-- SCREENSHOT PLACEHOLDER: docs/images/hero_preview.png -->
-> 📸 **Screenshot Needed (Hero Banner):** `docs/images/hero_preview.png`  
-> *Description: Full aesthetic screenshot of Lumens Deep running with an open high-res RAW portrait/landscape, active filmstrip, layers panel, and color grading in progress.*
+![Lumens Deep Studio](docs/images/hero_preview.png)
 
 **Lumens Deep** is an open-source, non-destructive 32-bit floating-point RAW photo editor and 3D neural relighting studio built with **Python**, **ModernGL**, and **PySide6**. It combines modern computational photography, high-performance GPU shaders, neural 3D scene estimation (Depth, Surface Normals, Alpha Matting), and an extensible plugin architecture.
 
@@ -28,16 +26,15 @@
   - Progressive Monte Carlo depth raymarching for genuine optical depth-of-field simulation.
   - Configurable aperture blades ($3$ to $12$ blades or smooth circular iris).
   - Optical cat-eye vignetting, chromatic aberration, specular highlight boost, and swirly Petzval distortion.
-  <!-- SCREENSHOT PLACEHOLDER: docs/images/readme_bokeh_showcase.png -->
-  > 📸 **Screenshot Needed:** `docs/images/readme_bokeh_showcase.png`  
-  > *Description: Split-wipe comparison or side-by-side demonstrating the realistic 3D Bokeh blur simulation.*
+
+  ![3D Bokeh Simulation](docs/images/12_bokeh_simulation_effect.png)
 
 - **🤖 Offline Neural AI Scene Estimation**:
   - Automatic map discovery from `LumenDeep/` subfolders (`_depth.png`, `_normals.png`, `_subject.png`).
   - Async multi-threaded background estimation for Metric Depth, High-Frequency Surface Normals, and Subject Alpha Matting.
   - Fast-path keyboard visualizers for 3D Depth (`D`), Surface Normals (`N`), Subject Mask (`S`), and Layer Mask (`M`).
-  <!-- SCREENSHOT PLACEHOLDER: docs/images/readme_ai_maps.png -->
-  > 📸 **Screenshot Needed:** `docs/images/readme_ai_maps.png`  
+
+  ![Neural 3D AI Maps](docs/images/11_ai_maps_4quadrant_showcase.png)
   > *Description: 4-quadrant preview showing Original Photo, Depth Map, Surface Normal Map, and Subject Matting Alpha Mask.*
 
 - **🧩 Community Plugin Architecture**:
@@ -82,7 +79,7 @@ For complete technical documentation, see [Architecture & Plugin Development Gui
 
 ### 1. Clone & Install Dependencies
 ```bash
-git clone https://github.com/your-username/LumensDeep.git
+git clone https://github.com/3dcarrots/LumensDeep.git
 cd LumensDeep
 
 # Install requirements

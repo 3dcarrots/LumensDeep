@@ -22,6 +22,18 @@
   - Hardware-accelerated ModernGL FBO accumulation pipeline with zero quality loss.
   - Perceptually uniform **OKLab / OKLCH** color management and sRGB OETF transfer curves.
 
+- **🔇 In-Memory AI Neural Noise Reduction (NAFNet-SIDD)**:
+  - Deep-learning RAW denoiser operating directly in-memory on 32-bit linear sensor floating-point data before tone mapping.
+  - Pre-trained on real-world sensor captures (**SIDD Benchmark - 40.30 dB PSNR**), eliminating photon shot noise and chrominance grain without plastic smoothing.
+  - High-frequency detail preservation with configurable **Strength** ($0-100\%$) and **Organic Texture Coring** ($0-100\%$).
+  - Cosine-window blended spatial tiling ($512/1024\text{px}$) with zero boundary seams and instant in-memory GPU texture updates.
+  - Automated ISO-threshold gating (e.g. `ISO > 200`) during 1-click batch AI auto-corrections and fast exports.
+
+  | Original Sensor RAW Capture (Noisy) | Lumens Deep NAFNet Denoised (Clean & Sharp) |
+  | :---: | :---: |
+  | ![Original Sensor RAW with Noise](docs/images/denoise_before.jpg) | ![Lumens Deep AI Denoised Result](docs/images/denoise_after.jpg) |
+  | *High-ISO RAW capture with prominent shot noise and chroma grain.* | *In-memory NAFNet restoration with 100% noise removal and sharp micro-detail.* |
+
 - **✨ 3D Depth & Cinematic Bokeh Raymarching**:
   - Progressive Monte Carlo depth raymarching for genuine optical depth-of-field simulation.
   - Configurable aperture blades ($3$ to $12$ blades or smooth circular iris).
@@ -61,7 +73,8 @@ Lumens Deep is organized around **Clean Architecture** principles to separate co
 
 ```mermaid
 graph TD
-    A[Image Loader / RAW Decoder<br/>src/core/image_io.py] -->|Linear RGB float32| B[PhotoEngine GPU<br/>src/core/engine.py]
+    A[Image Loader / RAW Decoder<br/>src/core/image_io.py] -->|32-bit Linear Sensor Float| K[AI Neural Denoiser<br/>src/core/raw_denoiser.py]
+    K -->|Clean Linear RGB float32| B[PhotoEngine GPU<br/>src/core/engine.py]
     C[Plugin Manager<br/>src/plugins/manager.py] -->|Stitched GLSL Shaders| B
     D[AI & 3D Neural Models<br/>src/core/ai_masking.py] -->|Depth / Normals / Subject| B
     B -->|Ping-Pong Accumulation FBO| E[PySide6 UI Orchestrator<br/>src/gui/main_window.py]
@@ -170,6 +183,7 @@ Restart the app — your new plugin is automatically discovered, registered in t
 | `B` | Toggle GPU Brush Mask Tool |
 | `C` | Toggle Interactive Crop & Straighten |
 | `\` | Toggle Before / After View |
+| `V` / `H` / `B` | Live Split Vertical / Horizontal / Side-by-Side Comparison (Pre-Denoised RAW vs Clean) |
 
 See full list in [Keyboard Shortcuts Reference](docs/SHORTCUTS.md).
 
@@ -182,6 +196,7 @@ See full list in [Keyboard Shortcuts Reference](docs/SHORTCUTS.md).
 - 📐 **[Software Architecture & Plugin Guide](docs/ARCHITECTURE.md)**: Deep dive into the engine, FBO pipeline, and plugin API.
 - ⌨️ **[Keyboard Shortcuts Cheat Sheet](docs/SHORTCUTS.md)**: Quick reference table for all shortcuts.
 - 🔬 **[Scientific Bokeh Raymarch Algorithm](docs/Scientific_Bokeh_Algorithm.md)**: Theory and mathematics behind 3D depth raymarch bokeh.
+- 🔇 **[Scientific AI Denoising Algorithm](docs/Scientific_AI_Denoising_Algorithm.md)**: Deep-learning Poisson-Gaussian noise modeling in 32-bit linear RAW space, NAFNet-SIDD architecture, and spatial cosine tiling.
 - 🧊 **[3D Depth & Normal Estimation](docs/Scientific_Depth_And_Normals_Algorithm.md)**: High-resolution surface normal and depth estimation pipelines.
 
 ---

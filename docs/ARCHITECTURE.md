@@ -38,6 +38,8 @@ graph TD
 LumensDeep/
 ├── docs/                                  # Documentation and architectural guides
 │   ├── ARCHITECTURE.md                    # System architecture & plugin guide
+│   ├── USER_GUIDE.md                      # Complete user manual & workflows
+│   ├── SHORTCUTS.md                       # Keyboard & mouse shortcut cheat sheet
 │   ├── Scientific_Bokeh_Algorithm.md      # Raymarch bokeh documentation
 │   ├── Scientific_Depth_And_Normals.md    # Neural 3D map algorithms
 │   └── Alpha_Mask_Generation.md           # Matting & segmentation documentation
@@ -50,24 +52,34 @@ LumensDeep/
 │   ├── core/                              # Core processing engine & I/O
 │   │   ├── engine.py                      # PhotoEngine: GPU pipeline, FBOs, Bokeh, Brush
 │   │   ├── image_io.py                    # RAW/CR3 decoding, EXIF metadata extraction
-│   │   └── ai_masking.py                  # AI neural estimation for Depth/Normals/Subject
+│   │   ├── raw_denoiser.py                # NAFNet-SIDD in-memory 32-bit linear RAW denoiser
+│   │   ├── ai_masking.py                  # AI neural pipeline (Laplacian PatchFusion tiling)
+│   │   ├── adaptive_depth_anything.py     # Heterogeneous AI engine (CUDA/TensorRT/DirectML/CPU)
+│   │   ├── gemini_assistant.py            # Gemini 3.7 Flash Thinking reasoning & auto-correction
+│   │   └── filmstrip_cache.py             # SQLite caching for instant metadata & thumbnails
 │   ├── gui/                               # PySide6 User Interface
 │   │   ├── docks/                         # Independent dockable widgets
 │   │   │   ├── folders_dock.py            # Hierarchical directory tree dock
 │   │   │   ├── global_dock.py             # Global lens, 3D bokeh & output dock
-│   │   │   ├── ai_dock.py                 # AI neural map computation dock
+│   │   │   ├── ai_dock.py                 # AI Gemini Assistant & 3D map computation dock
 │   │   │   ├── layers_dock.py             # Multi-layer management dock
 │   │   │   ├── layer_effects_dock.py      # Host for active layer plugin widgets
 │   │   │   ├── mask_dock.py               # Parametric, 3D & gradient masking dock
 │   │   │   └── filmstrip_dock.py          # Bottom image filmstrip container
+│   │   ├── workers/                       # Background computation threads
+│   │   │   ├── ai_culling_worker.py       # 2-Phase AI Batch Photo Culling & Micro-blur Verification
+│   │   │   ├── ai_denoise_worker.py       # NAFNet In-Memory Denoise asynchronous thread
+│   │   │   ├── gemini_worker.py           # Streaming Gemini Assistant background worker
+│   │   │   └── ai_map_worker.py           # Neural Depth / Normal / Subject generation worker
+│   │   ├── dialogs/                       # Modal dialogs (AI Culling, Export, Progress)
 │   │   ├── widgets/                       # Specialized viewport & toolbar widgets
 │   │   │   ├── viewport.py                # ImagePreviewLabel with interactive HUD
 │   │   │   └── toolbar.py                 # Viewport top toolbar & brush settings bar
 │   │   ├── folder_tree_widget.py          # Custom filesystem tree model
-│   │   ├── filmstrip_widget.py            # High-performance async thumbnail strip
+│   │   ├── filmstrip_widget.py            # High-performance async resizable thumbnail strip
 │   │   ├── spline_widget.py               # Interactive Bezier/Hermite LUT curve editor
 │   │   ├── theme.py                       # Dark sleek UI stylesheet & theme tokens
-│   │   └── main_window.py                 # Thin coordinator window & worker threads
+│   │   └── main_window.py                 # Thin coordinator window & state manager
 │   ├── plugins/                           # Modular Layer Effect Plugin System
 │   │   ├── base.py                        # BaseEffectPlugin abstract interface
 │   │   ├── manager.py                     # PluginManager: dynamic loader & GLSL stitcher
@@ -85,9 +97,9 @@ LumensDeep/
 │   │   ├── bokeh_raymarch.glsl            # Monte Carlo 3D depth raymarch bokeh shader
 │   │   ├── preview_map.glsl               # Fast-path 3D depth/normals/mask preview
 │   │   └── lens_correction.glsl           # Lensfun subpixel geometric/TCA distortion
-│   └── mcp_server.py                      # Model Context Protocol server for AI pair-coding
+│   └── mcp_server.py                      # FastMCP Server (stdio & SSE) for AI automation
 ├── requirements.txt                       # Python dependencies
-└── .env                                   # Environment configuration
+└── .env                                   # Environment configuration (GEMINI_API_KEY, etc.)
 ```
 
 ---
@@ -98,18 +110,35 @@ LumensDeep/
 
 The rendering engine is organized around **ModernGL** framebuffer objects (FBOs):
 
-1. **Source Texture (`self.texture`)**: 4-channel 32-bit float texture containing the linear sensor/RGB data.
-2. **Layer Rendering (`layer_fbo`)**: Each active layer runs its dynamically generated GLSL fragment shader (stitched from active plugins) with local adjustment parameters.
-3. **Accumulation & Mask Blending (`mask_blend.glsl`)**:
+1. **Source Texture (`self.raw_texture`, `self.texture`)**: 3-channel or 4-channel 32-bit float texture containing the linear sensor/RGB data. Uploaded directly without slow CPU alpha concatenation.
+2. **Optical Lens & 3D Map Undistortion (`lens_correction.glsl`)**:
+   - **Mode 1 (RGB Photo)**: Corrects radial barrel/pincushion distortion, transverse chromatic aberration (TCA dispersion across R/G/B channels), and optical vignetting.
+   - **Mode 2 (3D Spatial Maps)**: Applies pure geometric displacement (anchored to green channel geometry) to Depth Maps, Normal Maps, and Subject Masks, eliminating ghosting/doubling in 3D Bokeh and layer masks.
+3. **Layer Rendering (`layer_fbo`)**: Each active layer runs its dynamically generated GLSL fragment shader (stitched from active plugins) with local adjustment parameters.
+4. **Accumulation & Mask Blending (`mask_blend.glsl`)**:
    - Operates on ping-pong FBOs (`accum_1` and `accum_2`).
    - Blends `layer_fbo` onto the accumulation buffer using a composite alpha mask calculated from:
      $$\text{Final Mask} = \text{Brush Mask} \times \text{Parametric Mask (Luma/Hue/Sat)} \times \text{Gradient Mask} \times \text{3D Depth Mask} \times \text{3D Normal Mask} \times \text{Layer Opacity}$$
-4. **Cinematic 3D Bokeh Simulation (`bokeh_raymarch.glsl`)**:
+5. **Cinematic 3D Bokeh Simulation (`bokeh_raymarch.glsl`)**:
    - Uses progressive Monte Carlo raymarching over the 3D depth map.
    - Features Vogel spiral sampling, polygonal aperture blades (3 to 12 blades or circular), optical cat-eye vignetting, chromatic aberration, and foreground/background gamma curves.
-5. **Presentation Pass**:
+6. **Presentation Pass**:
    - Renders split comparisons (Vertical, Horizontal, Side-by-Side wipe) or Before/After modes.
    - Reads pixels to viewport with sRGB Transfer Function (OETF) applied on the CPU.
+
+### 3.2. Sub-50ms Fast Viewer & Instant Natural Preview Pipeline
+
+- **Hardware Scale-on-Decode**: Employs libjpeg hardware draft scale-on-decode to extract 2560px previews from 45MP camera sensor files in <40ms.
+- **Vectorized 256-Entry sRGB LUT**: Bypasses slow float exponentiation (`** 2.4`) in favor of O(1) table lookup (`get_srgb_to_linear_lut()`).
+- **Automatic Camera JPEG Caching**: Automatically saves in-camera JPEG byte streams to `{folder}/LumenDeep/{stem}_half.jpg` for sub-50ms future switching.
+- **Dirty State Tracking**: Implements `_initial_saved_state` and `_is_dirty` to guarantee non-destructive browsing without accidental project sidecar overwriting.
+
+### 3.3. Resilient Batch AI & Aspect Ratio Subfolder Exporter
+
+- **Infinite 10-Second Retry Loop**: Never skips or drops photos on Gemini rate limits (`429 Resource Exhausted`); automatically pauses and retries until success.
+- **Smart Resume & Skip**: Skips completed photos in ~40ms; fast-exports missing JPEGs from saved `.lumendeep` state in ~150ms without re-running AI passes.
+- **Aspect Ratio Subfolder Sorter**: Slices crops into `./LDExport/Original/`, `./LDExport/Photo_iPad_4x5/`, `./LDExport/Portrait_2x3/`, `./LDExport/Square_1x1/`, `./LDExport/Story_3x4/`, `./LDExport/Cinematic_16x9/`.
+- **5-Star Curation Rule**: Top 5★ photos automatically duplicate into root `./LDExport/` for fast client delivery.
 
 ### 3.2. Coordinate Systems & Brush Painting
 
@@ -252,23 +281,66 @@ class CustomPlugin(BaseEffectPlugin):
 
 ## 5. AI & 3D Neural Maps Architecture
 
-Lumens Deep includes a fully integrated offline neural inference engine (`src/core/ai_masking.py`):
+Lumens Deep includes a fully integrated, heterogeneous neural inference engine (`src/core/adaptive_depth_anything.py` and `src/core/ai_masking.py`):
 
-1. **Automatic Map Discovery (`LumenDeep/`)**:
-   - When loading an image (e.g. `photos/sample.CR3`), the application automatically checks for pre-computed maps in `photos/LumenDeep/`:
-     - `{stem}_depth.png` $\rightarrow$ Neural Depth Map
-     - `{stem}_normals.png` $\rightarrow$ High-Frequency Surface Normals
-     - `{stem}_subject.png` $\rightarrow$ Alpha Matting Subject Mask
-2. **Background Async Generation**:
-   - Users can trigger depth, normal, or subject mask estimation via the **`AI & 3D Tools`** menu or the **`AI Assistant Dock`**.
-   - Computation runs in a dedicated `AIMapWorkerThread(QThread)` with non-blocking progress updates and tile reporting.
-3. **Interactive 3D Geometry Masking**:
-   - Layers can be masked by depth intervals ($\text{min}$ to $\text{max}$ depth) or surface orientations (normal vector $\vec{N}$ and angular tolerance), enabling relighting and background separation without manual rotoscoping.
-4. **Keyboard Shortcuts for Neural Visualizers**:
-   - `D`: Toggle 3D Depth Map visualizer
-   - `N`: Toggle Surface Normal Map visualizer
-   - `S`: Toggle Subject / Background Mask visualizer
-   - `M`: Toggle Layer Mask overlay
+### 5.1. Multi-Backend Hardware Acceleration Hierarchy
+The engine discovers host hardware capabilities dynamically and initializes the fastest available backend:
+1. **NVIDIA TensorRT / CUDA FP16 (`CUDA_FP16`)**:
+   - Executes DepthAnythingV2 on NVIDIA Tensor Cores with half-precision floating-point arithmetic (`torch.float16`).
+   - Automatically sets `PYTORCH_CUDA_ALLOC_CONF="expandable_segments:True"` to mitigate VRAM fragmentation on Windows.
+2. **DirectML (DirectX 12 / `DirectML`)**:
+   - Accelerates neural inference across AMD Radeon, Intel Arc, and integrated Intel GPUs on Windows via ONNX Runtime `DmlExecutionProvider`.
+3. **CoreML / Metal (`CoreML`)**:
+   - Leverages the Apple Neural Engine and Metal framework on macOS.
+4. **PyTorch Multi-Threaded CPU (`PyTorch_CPU`)**:
+   - Highly optimized CPU fallback with intra-op thread parallelization.
+
+```mermaid
+graph TD
+    A[Hardware Capability Detection] --> B{NVIDIA GPU & CUDA?}
+    B -->|Yes| C[PyTorch CUDA FP16 / TensorRT<br/>~12x Speedup / Batched FP16]
+    B -->|No| D{Windows AMD/Intel GPU?}
+    D -->|Yes| E[ONNX Runtime DirectML<br/>DirectX 12 Compute]
+    D -->|No| F{Apple Silicon?}
+    F -->|Yes| G[CoreML Metal Execution]
+    F -->|No| H[PyTorch Multi-threaded CPU]
+    C -->|CUDA OOM / Driver Crash| I[Dynamic Crash Shield<br/>Purge VRAM & Fallback to CPU]
+    E -->|DirectX Exception| I
+    I --> H
+```
+
+### 5.2. Batched Tile Inference Pipeline
+In high-resolution Laplacian PatchFusion, patches are grouped into batches of $B \in \{4, 8\}$:
+- Inputs are batched into 4D tensors $(B, 3, 518, 518)$ and dispatched in single GPU kernel passes.
+- Saturates GPU compute units and eliminates per-tile Python interpreter and GIL overhead.
+
+### 5.3. Dynamic Crash Shield & Fault Tolerance
+- All inference passes are guarded with defensive exception handlers.
+- On `torch.cuda.OutOfMemoryError` or driver timeouts, the engine automatically:
+  1. Purges VRAM cache (`torch.cuda.empty_cache()`, `torch.cuda.ipc_collect()`, `gc.collect()`).
+  2. Transitions execution mode to `PyTorch_CPU` (Safe Mode).
+  3. Resumes and completes the remaining tiles without throwing an unhandled exception or crashing the UI.
+
+### 5.4. Automatic Map Discovery (`LumenDeep/`)
+- When loading an image (e.g. `photos/sample.CR3`), the application automatically checks for pre-computed maps in `photos/LumenDeep/`:
+  - `{stem}_depth.png` $\rightarrow$ Neural Depth Map
+  - `{stem}_normals.png` $\rightarrow$ High-Frequency Surface Normals
+  - `{stem}_subject.png` $\rightarrow$ Alpha Matting Subject Mask
+- Computation runs in an asynchronous `AIMapWorkerThread(QThread)` with live progress and cancellation support.
+
+### 5.5. Keyboard Shortcuts for Neural Visualizers
+- `D`: Toggle 3D Depth Map visualizer
+- `N`: Toggle Surface Normal Map visualizer
+- `S`: Toggle Subject / Background Mask visualizer
+- `M`: Toggle Layer Mask overlay
+
+### 5.6. AI In-Memory Neural Denoising (`src/core/raw_denoiser.py`)
+- **Architecture**: NAFNet (Nonlinear Activation Free Network) with SimpleGate and Simplified Channel Attention (SCA), pre-trained on SIDD.
+- **In-Memory 32-Bit Linear Processing**: Operates on linear float32 radiometric data directly from the camera sensor before ISP tone curves, maintaining Poisson-Gaussian noise statistics.
+- **Cosine-Blended Spatial Tiling**: Breaks 24MP–45MP full-frame photographs into overlapping 512x512 or 1024x1024 tiles with 2D Hann/cosine blending window to ensure seamless edge integration without grid lines.
+- **High-Frequency Texture & Detail Blending**: Separates high-frequency noise from organic micro-textures, allowing the user to blend between pure denoised output and preserved organic film grain ($100\%$ strength, $25\%$ texture default).
+- **Asynchronous Worker Thread (`src/gui/workers/ai_denoise_worker.py`)**: Executes in a non-blocking background `QThread` with progress reporting, updating `self.engine.update_image_data(denoised_rgb, is_denoised=True)`.
+- **Automated Batch Export Gating**: Inspects sensor ISO; automatically denoises high-ISO captures (> 200) prior to export, updating `.lumendeep` project sidecars with `"is_denoised": True`.
 
 ---
 

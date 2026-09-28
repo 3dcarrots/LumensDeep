@@ -1,0 +1,27 @@
+rawpy
+imageio
+tifffile
+moderngl
+numpy
+Pillow
+mcp
+fastmcp
+PySide6
+uvicorn
+starlette
+lensfunpy
+exifread
+python-dotenv
+google-genai
+pydantic
+pyexiv2
+torch
+torchvision
+transformers
+rembg[cli]
+onnxruntime
+diffusers
+accelerate
+
+# For NVIDIA GPU hardware acceleration on Windows, install PyTorch with CUDA:
+# pip install torch torchvision --index-url https://download.pytorch.org/whl/cu126

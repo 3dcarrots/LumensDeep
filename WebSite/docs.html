@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: https://ogp.me/ns#">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  
+  <!-- Primary SEO Meta Tags -->
+  <title>Documentation & User Manual — Lumens Deep 32-Bit RAW Studio</title>
+  <meta name="title" content="Documentation & User Manual — Lumens Deep 32-Bit RAW Studio">
+  <meta name="description" content="Complete documentation and user guide for Lumens Deep: Learn 32-bit floating-point linear RAW development, 3D progressive Bokeh raymarching, OKLCH color grading, and plugin architecture.">
+  <meta name="keywords" content="Lumens Deep documentation, RAW photo editing guide, 3D bokeh raymarching tutorial, OKLCH color equalizer, ModernGL shader plugins, non-destructive layer masks, rawpy LibRaw workflow">
+  <meta name="author" content="Volodymyr Makovetskyi">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta name="theme-color" content="#00d2ff">
+  <link rel="canonical" href="https://lumensdeep.com/docs.html">
+
+  <!-- Favicons -->
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/images/apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
+
+  <!-- Open Graph / Social Media -->
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Lumens Deep">
+  <meta property="og:url" content="https://lumensdeep.com/docs.html">
+  <meta property="og:title" content="Documentation & User Manual — Lumens Deep">
+  <meta property="og:description" content="Step-by-step user guide for 32-bit linear RAW development, 3D Bokeh raymarching, Tone Equalizers, and GPU shader plugins.">
+  <meta property="og:image" content="https://lumensdeep.com/assets/images/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="en_US">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://lumensdeep.com/docs.html">
+  <meta name="twitter:title" content="Documentation & User Manual — Lumens Deep">
+  <meta name="twitter:description" content="Learn 32-bit linear RAW workflow, 3D Bokeh raymarching, Tone Equalizers, and GPU shader plugins.">
+  <meta name="twitter:image" content="https://lumensdeep.com/assets/images/og-image.jpg">
+
+  <!-- Google Fonts Preconnect & Stylesheets -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- JSON-LD Structured Data: TechArticle & BreadcrumbList -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "TechArticle",
+        "@id": "https://lumensdeep.com/docs.html#article",
+        "headline": "Lumens Deep User Guide and Technical Documentation",
+        "description": "Comprehensive user guide covering the 32-bit linear GPU rendering pipeline, progressive 3D optical Bokeh simulation, OKLCH color equalizers, and neural depth relighting.",
+        "url": "https://lumensdeep.com/docs.html",
+        "image": "https://lumensdeep.com/assets/images/og-image.jpg",
+        "author": {
+          "@type": "Person",
+          "name": "Volodymyr Makovetskyi"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "Lumens Deep",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://lumensdeep.com/assets/images/favicon-32x32.png"
+          }
+        },
+        "datePublished": "2026-08-17",
+        "dateModified": "2026-08-17",
+        "mainEntityOfPage": "https://lumensdeep.com/docs.html"
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://lumensdeep.com/docs.html#breadcrumb",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://lumensdeep.com/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Documentation",
+            "item": "https://lumensdeep.com/docs.html"
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+
+  <!-- Navigation Header -->
+  <header class="site-header" id="site-header">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo" id="brand-logo-link">
+        <div class="brand-logo-icon">📸</div>
+        <span>Lumens Deep</span>
+      </a>
+      
+      <ul class="nav-links">
+        <li><a href="index.html#features" class="nav-link">Features</a></li>
+        <li><a href="index.html#bokeh-showcase" class="nav-link">3D Bokeh</a></li>
+        <li><a href="index.html#ai-maps" class="nav-link">Neural Maps</a></li>
+        <li><a href="docs.html" class="nav-link active">Documentation</a></li>
+        <li><a href="shortcuts.html" class="nav-link">Shortcuts</a></li>
+      </ul>
+      
+      <div class="nav-actions">
+        <a href="https://github.com/3dcarrots/LumensDeep" target="_blank" class="btn btn-secondary btn-sm">GitHub</a>
+        <a href="index.html#download" class="btn btn-primary btn-sm">Get App</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Documentation Layout -->
+  <div class="container docs-layout">
+    
+    <!-- Sticky Sidebar -->
+    <aside class="docs-sidebar">
+      <input type="text" placeholder="🔍 Search documentation..." class="docs-search-input" id="docs-search">
+      
+      <div class="docs-nav-group">
+        <div class="docs-nav-title">Getting Started</div>
+        <ul class="docs-nav-list">
+          <li class="docs-nav-item"><a href="#installation">Installation & Setup</a></li>
+          <li class="docs-nav-item"><a href="#workspace-overview">Workspace Overview</a></li>
+          <li class="docs-nav-item"><a href="#supported-formats">Supported Formats</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-nav-group">
+        <div class="docs-nav-title">Canvas & Navigation</div>
+        <ul class="docs-nav-list">
+          <li class="docs-nav-item"><a href="#viewport-navigation">Pan, Zoom & 1:1 Scale</a></li>
+          <li class="docs-nav-item"><a href="#crop-straighten">Crop & Straighten HUD</a></li>
+          <li class="docs-nav-item"><a href="#comparison-modes">Split Wipe & Comparisons</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-nav-group">
+        <div class="docs-nav-title">Color & Adjustments</div>
+        <ul class="docs-nav-list">
+          <li class="docs-nav-item"><a href="#layer-system">Non-Destructive Layers</a></li>
+          <li class="docs-nav-item"><a href="#basic-adjustments">Basic Adjustments</a></li>
+          <li class="docs-nav-item"><a href="#tone-equalizer">OKLCH Tone Equalizer</a></li>
+          <li class="docs-nav-item"><a href="#color-equalizer">Color & Shadow Equalizers</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-nav-group">
+        <div class="docs-nav-title">Masking & 3D Optics</div>
+        <ul class="docs-nav-list">
+          <li class="docs-nav-item"><a href="#brush-masking">GPU Brush Painting</a></li>
+          <li class="docs-nav-item"><a href="#parametric-masks">Parametric & Gradient Masks</a></li>
+          <li class="docs-nav-item"><a href="#3d-bokeh-raymarch">3D Bokeh Simulation</a></li>
+          <li class="docs-nav-item"><a href="#neural-ai-maps">Offline 3D Neural Maps</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-nav-group">
+        <div class="docs-nav-title">AI & Smart Workflow</div>
+        <ul class="docs-nav-list">
+          <li class="docs-nav-item"><a href="#gemini-assistant">Gemini 3.7 Flash Assistant</a></li>
+          <li class="docs-nav-item"><a href="#ai-culling">2-Phase AI Batch Culling</a></li>
+          <li class="docs-nav-item"><a href="#ai-denoise">AI Neural Denoising (NAFNet)</a></li>
+          <li class="docs-nav-item"><a href="#filmstrip-features">Filmstrip & 3D Badges</a></li>
+          <li class="docs-nav-item"><a href="#mcp-server">FastMCP Server Integration</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-nav-group">
+        <div class="docs-nav-title">Extensibility & Export</div>
+        <ul class="docs-nav-list">
+          <li class="docs-nav-item"><a href="#plugin-development">Writing Custom Plugins</a></li>
+          <li class="docs-nav-item"><a href="#export-sidecars">Sidecars & 16-Bit Export</a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="docs-content">
+      
+      <h1>Lumens Deep Documentation & User Manual</h1>
+      <p style="font-size: 1.15rem; color: var(--text-secondary);">
+        Welcome to the official manual for <strong>Lumens Deep</strong>. Learn how to unleash the full power of 32-bit linear RAW computational photography, progressive 3D depth raymarching, and custom GPU plugin development.
+      </p>
+
+      <!-- Section: Installation -->
+      <section id="installation">
+        <h2>1. Installation & System Requirements</h2>
+        <p>Lumens Deep is built with Python 3.10+, ModernGL, and PySide6. It is fully cross-platform (Windows 10/11, macOS, Linux).</p>
+        
+        <h3>System Requirements:</h3>
+        <ul>
+          <li><strong>Operating System:</strong> Windows 10/11 (64-bit), macOS 12+, or modern Linux distribution.</li>
+          <li><strong>Graphics Hardware (AI & Rendering):</strong>
+            <ul>
+              <li><strong>NVIDIA GPU Acceleration (Recommended):</strong> NVIDIA GeForce RTX / GTX Series (CUDA 12.1+ / 12.6+ / 12.8 driver) for ~12x faster neural processing.</li>
+              <li><strong>AMD / Intel GPU Acceleration:</strong> DirectX 12 / DirectML compatible dedicated or integrated graphics.</li>
+              <li><strong>Apple Silicon:</strong> M1/M2/M3/M4 via CoreML / Metal.</li>
+              <li><strong>Rendering:</strong> Dedicated or integrated GPU supporting OpenGL 3.3+ (ModernGL).</li>
+            </ul>
+          </li>
+          <li><strong>Python Version:</strong> Python 3.10, 3.11, 3.12, or 3.14+.</li>
+        </ul>
+
+        <h3>Step-by-Step Installation:</h3>
+        
+        <div class="docs-callout">
+          <div class="docs-callout-title">⚡ 1. Clone Repository & Install Base Dependencies</div>
+          <pre><code>git clone https://github.com/3dcarrots/LumensDeep.git
+cd LumensDeep
+pip install -r requirements.txt</code></pre>
+        </div>
+
+        <div class="docs-callout">
+          <div class="docs-callout-title">🚀 2. Enable GPU Hardware Acceleration for AI</div>
+          <p style="margin-bottom: 0.5rem; font-size: 0.95rem;">Choose the command corresponding to your hardware setup:</p>
+          
+          <p><strong>For NVIDIA GPUs (CUDA 12.6 Acceleration — ~12x Speedup):</strong></p>
+          <pre><code>pip install torch torchvision --index-url https://download.pytorch.org/whl/cu126 --upgrade</code></pre>
+
+          <p><strong>For AMD / Intel / Windows GPUs (DirectX 12 DirectML Acceleration):</strong></p>
+          <pre><code>pip install onnxruntime-directml</code></pre>
+
+          <p><strong>For CPU-Only Mode:</strong> No additional packages needed; Lumens Deep automatically falls back to optimized multi-threaded CPU processing.</p>
+        </div>
+
+        <div class="docs-callout">
+          <div class="docs-callout-title">▶️ 3. Launch Lumens Deep</div>
+          <pre><code>python src/gui/main_window.py</code></pre>
+        </div>
+      </section>
+
+      <!-- Section: Workspace Overview -->
+      <section id="workspace-overview">
+        <h2>2. Workspace & Dock Navigation</h2>
+        <p>The interface is structured into modular dockable widgets configured for ergonomic photo editing workflows:</p>
+
+        <div class="docs-callout">
+          <div class="docs-callout-title">💡 Pro-Tip: Dock Minimum Width Constraints</div>
+          Left dock panels maintain a strict minimum width of 290px, and right adjustment panels maintain 320px to ensure slider controls and folder trees never get truncated.
+        </div>
+
+        <ul>
+          <li><strong>Left Dock Tabs:</strong>
+            <ul>
+              <li><strong>Folders Dock:</strong> Hierarchical directory explorer with automatic subfolder discovery.</li>
+              <li><strong>Global Settings Dock:</strong> Lens calibration, 3D Bokeh raymarching controls, and output base curves.</li>
+              <li><strong>AI Assistant Dock:</strong> Background queue for computing 3D Depth Maps, Surface Normals, and Subject Matting.</li>
+            </ul>
+          </li>
+          <li><strong>Central Viewport:</strong> High-performance canvas with GPU zoom, pan, interactive Crop & Straighten HUD, and Before/After Split comparison wipe.</li>
+          <li><strong>Right Dock Panels:</strong>
+            <ul>
+              <li><strong>Layers Dock:</strong> Non-destructive layer stack with blend modes, opacity sliders, and mask preview icons.</li>
+              <li><strong>Layer Effects Dock:</strong> Host for active layer adjustment plugins (Basic Adjustments, Tone Equalizer, Color Equalizer).</li>
+              <li><strong>Masks Dock:</strong> Precision parametric OKLCH color, luminance range, linear/radial gradients, and 3D depth/normal masking.</li>
+            </ul>
+          </li>
+          <li><strong>Bottom Filmstrip Dock:</strong> Multi-threaded async thumbnail browser with disk caching and fast image switching.</li>
+        </ul>
+
+        <div class="docs-screenshot-frame">
+          <img src="assets/images/01_workspace_overview.png" alt="Lumens Deep Workspace Overview" class="docs-screenshot-img" onerror="this.parentElement.style.display='none'">
+          <div class="docs-screenshot-caption">📸 Figure 2.1 — Lumens Deep modular dock workspace overview.</div>
+        </div>
+      </section>
+
+      <!-- Section: Supported Formats -->
+      <section id="supported-formats">
+        <h2>3. Supported File Formats, Mipmapping & Color Pipeline</h2>
+        <p>Lumens Deep processes sensor data through a pure 32-bit linear floating-point pipeline:</p>
+        <ul>
+          <li><strong>RAW Sensor Formats:</strong> Canon (<code>.CR3</code>, <code>.CR2</code>), Nikon (<code>.NEF</code>), Sony (<code>.ARW</code>), Fujifilm (<code>.RAF</code>), Panasonic/Leica (<code>.RW2</code>), Adobe Digital Negative (<code>.DNG</code>).</li>
+          <li><strong>Hardware Trilinear Mipmap Anti-Aliasing:</strong> 45MP+ RAW textures automatically generate GPU mipmap pyramids (<code>GL_LINEAR_MIPMAP_LINEAR</code>), eliminating sensel aliasing, moiré patterns, and downsampling noise in viewport preview.</li>
+          <li><strong>Standard Image Formats:</strong> <code>.TIFF</code> (8/16/32-bit float), <code>.PNG</code>, <code>.JPG</code>, <code>.JPEG</code>, <code>.WEBP</code>, <code>.EXR</code>.</li>
+          <li><strong>Perceptual Color Science:</strong> Tone and color equalizers operate in perceptual <strong>OKLab / OKLCH</strong> color space, preventing hue shifts when adjusting high-key luminance.</li>
+        </ul>
+      </section>
+
+      <!-- Section: Viewport Navigation -->
+      <section id="viewport-navigation">
+        <h2>4. Viewport Navigation & Canvas Controls</h2>
+        <p>Navigate effortlessly across high-resolution photos:</p>
+        <ul>
+          <li><strong>Smooth Zoom:</strong> Scroll the <strong>Mouse Wheel</strong> up/down (centered at cursor), or use <code>Ctrl + +</code> / <code>Ctrl + -</code>.</li>
+          <li><strong>Pan:</strong> Hold <strong>Left Click and Drag</strong> (when brush tool is idle) or <strong>Middle Mouse Drag</strong> anywhere.</li>
+          <li><strong>Fit to Viewport:</strong> Press <code>Ctrl + 0</code> or click <em>Fit View</em> on the top toolbar.</li>
+          <li><strong>1:1 Pixel Scale (100%):</strong> Press <code>Ctrl + 1</code> or click <em>1:1 View</em> to inspect fine details.</li>
+        </ul>
+      </section>
+
+      <!-- Section: Crop & Straighten -->
+      <section id="crop-straighten">
+        <h2>5. Interactive Crop, Aspect Ratios & Straighten HUD</h2>
+        <p>Press <code>C</code> or click the <strong>📐 Crop & Straighten</strong> button on the toolbar to activate the interactive crop HUD:</p>
+        <ul>
+          <li><strong>Aspect Ratio Presets:</strong> Choose standard framing ratios (<code>Free</code>, <code>Original</code>, <code>1:1</code>, <code>4:5</code>, <code>16:9</code>, <code>3:2</code>) directly from the top toolbar, Global dock, or before running batch processing.</li>
+          <li><strong>Golden Rule-of-Thirds Grid:</strong> Dynamic grid overlay updates in real-time as you resize.</li>
+          <li><strong>8 Corner L-Brackets & Midpoint Tabs:</strong> Drag to adjust horizontal and vertical crop bounds.</li>
+          <li><strong>Interactive Rotation:</strong> Hover just outside any corner bracket (the cursor transforms into a curved rotation arrow) and drag to straighten tilted horizons (<code>-45.0°</code> to <code>+45.0°</code>).</li>
+          <li><strong>Commit or Cancel:</strong> Press <code>Enter</code> to apply crop or <code>Esc</code> to cancel without applying.</li>
+        </ul>
+
+        <div class="docs-screenshot-frame">
+          <img src="assets/images/03_crop_and_straighten_hud.png" alt="Interactive Crop & Straighten HUD" class="docs-screenshot-img" onerror="this.parentElement.style.display='none'">
+          <div class="docs-screenshot-caption">📸 Figure 5.1 — Rule-of-Thirds crop HUD and corner rotation handle.</div>
+        </div>
+      </section>
+
+      <!-- Section: Comparison Modes -->
+      <section id="comparison-modes">
+        <h2>6. Split Wipe & Before/After Comparison</h2>
+        <p>Inspect adjustments against the original untouched sensor data:</p>
+        <ul>
+          <li><strong>Before Mode (<code>\</code>):</strong> Instantly preview the original unprocessed RAW capture.</li>
+          <li><strong>Vertical Split Wipe (<code>V</code>):</strong> Divides the canvas into Before (left) and After (right). Drag the vertical divider line horizontally.</li>
+          <li><strong>Horizontal Split Wipe (<code>H</code>):</strong> Divides canvas vertically (top Before, bottom After).</li>
+          <li><strong>Side-by-Side View (<code>B</code>):</strong> Dual-pane simultaneous comparison.</li>
+        </ul>
+
+        <div class="docs-screenshot-frame">
+          <img src="assets/images/04_split_wipe_comparison.png" alt="Vertical Split Wipe Comparison" class="docs-screenshot-img" onerror="this.parentElement.style.display='none'">
+          <div class="docs-screenshot-caption">📸 Figure 6.1 — Interactive vertical split comparison wipe.</div>
+        </div>
+      </section>
+
+      <!-- Section: Non-Destructive Layers -->
+      <section id="layer-system">
+        <h2>7. Non-Destructive Layer Architecture</h2>
+        <p>Every photo opens with a <strong>Base Layer</strong>. Add targeted local adjustments by stacking layers:</p>
+        <ul>
+          <li>Click <strong><code>+ New Layer</code></strong> in the Layers dock.</li>
+          <li>Adjust layer opacity ($0\%$ to $100\%$) to control overall adjustment strength.</li>
+          <li>Each layer maintains its own independent set of plugin settings, masks, and blend parameters.</li>
+        </ul>
+
+        <div class="docs-screenshot-frame">
+          <img src="assets/images/05_layer_stack_dock.png" alt="Non-Destructive Layers Dock" class="docs-screenshot-img" onerror="this.parentElement.style.display='none'">
+          <div class="docs-screenshot-caption">📸 Figure 7.1 — Layers panel with stacked adjustments and opacity sliders.</div>
+        </div>
+      </section>
+
+      <!-- Section: Basic Adjustments -->
+      <section id="basic-adjustments">
+        <h2>8. Built-in Basic Adjustments Plugin</h2>
+        <p>The <strong>Basic Adjustments</strong> plugin provides fundamental photographic controls running in pure GLSL:</p>
+        <ul>
+          <li><strong>Exposure ($-3.0$ to $+3.0$ EV):</strong> True linear sensor gain compensation.</li>
+          <li><strong>White Balance:</strong> Temperature (Kelvin shift) and Tint (Green-Magenta balance).</li>
+          <li><strong>Highlights & Shadows Recovery:</strong> Bilateral tone compression to restore sky details and open shadow depth.</li>
+          <li><strong>Whites & Black Level:</strong> Set black clipping point and specular headroom.</li>
+          <li><strong>Denoise (Luma & Chroma):</strong> YCbCr bilateral filter noise reduction preserving edge sharpness.</li>
+          <li><strong>Sharpening:</strong> High-pass frequency boost with threshold gating.</li>
+        </ul>
+
+        <div class="docs-screenshot-frame">
+          <img src="assets/images/06_basic_adjustments_plugin.png" alt="Basic Adjustments Plugin Controls" class="docs-screenshot-img" onerror="this.parentElement.style.display='none'">
+          <div class="docs-screenshot-caption">📸 Figure 8.1 — Basic adjustments controls and white balance panel.</div>
+        </div>
+      </section>
+
+      <!-- Section: Tone Equalizer -->
+      <section id="tone-equalizer">
+        <h2>9. 8-Band OKLCH Tone Equalizer</h2>
+        <p>Unlike conventional curve editors that distort saturation, the Tone Equalizer operates in perceptual OKLCH color space across 8 luminance bands:</p>
+        <ul>
+          <li>Bands span from $-8\text{ EV}$ (deep shadows) through $-4\text{ EV}$ (midtones) to $+1\text{ EV}$ (specular highlights).</li>
+          <li>Drag control points on the interactive spline widget to boost or tame specific exposure zones smoothly.</li>
+        </ul>
+
+        <div class="docs-screenshot-frame">
+          <img src="assets/images/07_tone_equalizer_spline.png" alt="8-Band OKLCH Tone Equalizer Spline" class="docs-screenshot-img" onerror="this.parentElement.style.display='none'">
+          <div class="docs-screenshot-caption">📸 Figure 9.1 — Tone Equalizer interactive 8-band OKLCH spline curve.</div>
+        </div>
+      </section>
+
+      <!-- Section: Color Equalizers -->
+      <section id="color-equalizer">
+        <h2>10. Color & Shadow Color Equalizers</h2>
+        <p>Selective color grading across 8 primary hue zones (Reds, Oranges, Yellows, Greens, Cyans, Blues, Purples, Magentas):</p>
+        <ul>
+          <li><strong>Color Equalizer:</strong> Adjust Hue Shift, Saturation Scale, and Lightness Offset for each color band.</li>
+          <li><strong>Shadow Color Equalizer:</strong> Applies hue and saturation adjustments selectively inside shadows for cinematic split-toning.</li>
+        </ul>
+
+        <div class="docs-screenshot-frame">
+          <img src="assets/images/08_color_equalizer_cards.png" alt="Color & Shadow Color Equalizers" class="docs-screenshot-img" onerror="this.parentElement.style.display='none'">
+          <div class="docs-screenshot-caption">📸 Figure 10.1 — 8-channel Color Equalizer adjustment cards.</div>
+        </div>
+      </section>
+
+      <!-- Section: GPU Brush Masking -->
+      <section id="brush-masking">
+        <h2>11. GPU Brush Painting & Precision Masking</h2>
+        <p>Paint precision adjustment masks directly on the canvas:</p>
+        <ul>
+          <li>Press <code>B</code> to activate the brush tool.</li>
+          <li>Adjust <strong>Radius</strong>, <strong>Edge Hardness</strong>, and <strong>Opacity</strong> in the toolbar.</li>
+          <li><strong>Sub-Pixel Stroke Interpolation:</strong> When sweeping the mouse quickly, Lumens Deep interpolates intermediate stamps at $15\%$ spacing along the vector path, guaranteeing smooth, solid lines with zero gaps.</li>
+          <li><strong>Erase Mode:</strong> Hold <strong>Right Click</strong> to erase painted areas.</li>
+        </ul>
+
+        <div class="docs-screenshot-frame">
+          <img src="assets/images/09_brush_painting_action.png" alt="GPU Brush Mask Painting" class="docs-screenshot-img" onerror="this.parentElement.style.display='none'">
+          <div class="docs-screenshot-caption">📸 Figure 11.1 — Hardware-accelerated GPU brush painting and stroke interpolation.</div>
+        </div>
+
+        <div class="docs-screenshot-frame">
+          <img src="assets/images/10_mask_dock_and_3d_masks.png" alt="Masks Dock & 3D Mask Controls" class="docs-screenshot-img" onerror="this.parentElement.style.display='none'">
+          <div class="docs-screenshot-caption">📸 Figure 11.2 — Precision 3D Depth and Surface Normal orientation masks.</div>
+        </div>
+      </section>
+
+      <!-- Section: 3D Bokeh Simulation -->
+      <section id="3d-bokeh-raymarch">
+        <h2>12. 3D Depth & Cinematic Bokeh Raymarching</h2>
+        <p>Transform flat scenes into shallow depth-of-field masterpieces using optical Monte Carlo raymarching:</p>
+        <ul>
+          <li><strong>🎯 3D Canvas Focus Eyedropper:</strong> Click the target picker icon and click anywhere on the subject's face/eyes on canvas to automatically sample metric depth and lock the focal plane.</li>
+          <li><strong>Focal Distance:</strong> Slide right to focus deep into the background; slide left to focus on near foreground objects.</li>
+          <li><strong>Focal Range:</strong> Controls Depth of Field (DoF) slab thickness ($20-35\%$ recommended for tack-sharp portrait subjects).</li>
+          <li><strong>Subject Influence:</strong> Set to $0\%$ initially for organic optical blur roll-off without harsh cutout borders.</li>
+          <li><strong>Aperture Blades:</strong> Configurable from 3 blades (Triangle), 4 blades (Square) up to 10 blades (Circular smooth lens).</li>
+          <li><strong>Optical Cat-Eye Vignetting:</strong> Accurately truncates blur discs towards the frame perimeter.</li>
+          <li><strong>Chromatic Aberration:</strong> Adds subtle radial color dispersion to specular highlights.</li>
+        </ul>
+
+        <div class="docs-screenshot-frame">
+          <img src="assets/images/12_bokeh_simulation_effect.png" alt="3D Bokeh Optical Raymarching Simulation" class="docs-screenshot-img" onerror="this.parentElement.style.display='none'">
+          <div class="docs-screenshot-caption">📸 Figure 12.1 — Progressive 3D Bokeh raymarching with realistic aperture blades and cat-eye vignetting.</div>
+        </div>
+      </section>
+
+      <!-- Section: Offline Neural Maps -->
+      <section id="neural-ai-maps">
+        <h2>13. Offline 3D Neural Maps & GPU Hardware Acceleration</h2>
+        <p>Lumens Deep automatically checks for pre-computed maps in the <code>LumenDeep/</code> subfolder beside your photos:</p>
+        <ul>
+          <li><code>{stem}_depth.png</code> $\rightarrow$ 3D Metric Depth Map</li>
+          <li><code>{stem}_normals.png</code> $\rightarrow$ High-Frequency Surface Normals</li>
+          <li><code>{stem}_subject.png</code> $\rightarrow$ Alpha Matting Subject Mask</li>
+        </ul>
+        <p>Generate maps on demand via the <strong>AI & 3D Tools</strong> menu: <code>Ctrl+Shift+D</code> (Depth), <code>Ctrl+Shift+N</code> (Normals), <code>Ctrl+Shift+S</code> (Subject), or <code>Ctrl+Shift+A</code> (Compute All).</p>
+
+        <h3>⚡ Multi-Backend Hardware Acceleration & Safe Mode:</h3>
+        <p>Lumens Deep features an adaptive, heterogeneous engine that dynamically selects the fastest hardware backend available:</p>
+        <ul>
+          <li><strong>NVIDIA CUDA FP16 (Recommended):</strong> Utilizes Tensor Cores and batched patch dispatch ($B=4..8$), yielding <strong>~12x faster inference (0.024s / tile on RTX 4070)</strong>.</li>
+          <li><strong>DirectML (DirectX 12):</strong> Provides GPU acceleration on Windows for AMD Radeon, Intel Arc, and Intel UHD/Iris Graphics.</li>
+          <li><strong>CoreML (Metal):</strong> Hardware acceleration for Apple Silicon Neural Engine.</li>
+          <li><strong>Multi-Threaded CPU:</strong> Resilient fallback on non-GPU systems.</li>
+        </ul>
+
+        <div class="docs-callout">
+          <div class="docs-callout-title">🛡️ GPU Safe Mode & Dynamic Crash Shield</div>
+          <p>In the <strong>AI Assistant Dock</strong>, the <strong>⚡ AI Hardware & GPU Acceleration</strong> card gives you full control:</p>
+          <ul style="margin-bottom: 0;">
+            <li><strong>Live Hardware Status:</strong> Displays your active GPU device and available VRAM.</li>
+            <li><strong>Engine Mode Selector:</strong> Switch between <code>Auto</code>, <code>NVIDIA CUDA</code>, <code>DirectML</code>, or <code>CPU Safe Mode</code>.</li>
+            <li><strong>[ ] 🛡️ Disable GPU (Safe Mode / CPU Only):</strong> Checkbox to completely bypass GPU memory allocation. If you experience GPU driver timeouts, low VRAM issues, or background rendering conflicts, enabling Safe Mode forces instant CPU execution without restarting the app.</li>
+            <li><strong>Auto-Recovery:</strong> If a GPU out-of-memory error occurs during high-res tiling, Lumens Deep automatically catches the error, purges VRAM, and completes the frame on CPU without crashing.</li>
+          </ul>
+        </div>
+
+        <div class="docs-screenshot-frame">
+          <img src="assets/images/11_ai_maps_4quadrant_showcase.png" alt="4-Quadrant Neural Maps Showcase" class="docs-screenshot-img" onerror="this.parentElement.style.display='none'">
+          <div class="docs-screenshot-caption">📸 Figure 13.1 — 4-Quadrant neural scene analysis: Color Render, 3D Depth, Surface Normals, and Subject Matte.</div>
+        </div>
+      </section>
+
+      <!-- Section: Google Gemini 3.7 Flash AI Assistant -->
+      <section id="gemini-assistant">
+        <h2>14. Google Gemini 3.7 Flash AI Assistant</h2>
+        <p>Lumens Deep integrates <strong>Google Gemini 3.7 Flash</strong> with extended Thinking Reasoning as an intelligent co-pilot for automated photo development:</p>
+        <ul>
+          <li><strong>📋 Studio Retouching Rules (Top):</strong> Persistent fine-art guidelines used by auto-correction and batch AI processing (e.g. prioritizing 3D facial volume, rich base curves, warm healthy skin tones, and background separation).</li>
+          <li><strong>💬 One-Time AI Action Prompts (Bottom):</strong> Send single-use instructions (e.g. <em>"Focus on the child's face"</em>, <em>"Make skin tones warmer"</em>, <em>"Add 3D volume"</em>) via <code>Enter</code> hotkey. Input field auto-clears on send and never contaminates general rules. Quick suggestion chips provide one-click presets.</li>
+          <li><strong>⚡ Multi-Pass Auto-Correction:</strong> Evaluates dynamic range, highlight rolloff, shadows, white balance, contrast, and composition with $50\%$ dampened multi-pass convergence.</li>
+          <li><strong>📐 Automated Straightening & Rule-of-Thirds Crop:</strong> Gemini actively levels tilted horizons (<code>straighten</code>) and applies compositional crops (<code>crop</code>) to remove clutter.</li>
+          <li><strong>🛡️ AI Bokeh A/B Verification:</strong> Automatically renders and evaluates with-bokeh vs without-bokeh frames at the end of auto-tuning to protect the subject from accidental blur.</li>
+          <li><strong>Deep Thinking Budget:</strong> Configurable reasoning tokens ($1024$ to $4096$) allow Gemini to deeply reason before suggesting parameter adjustments.</li>
+        </ul>
+      </section>
+
+      <!-- Section: 2-Phase AI Photo Culling & Batch Automation -->
+      <section id="ai-culling">
+        <h2>15. 2-Phase AI Batch Culling & Resilient Batch Automation</h2>
+        <p>Effortlessly triage, rate, and automate large photo shoots with zero dropped photos (<code>Ctrl + Shift + C</code> / <code>Ctrl + Shift + A</code>):</p>
+        <ul>
+          <li><strong>Phase 1 (Quick Global Triage):</strong> Analyzes 10 photos per batch, assigning 1–5 Star Ratings, flagging rejects (<code>❌</code>), and proactively marking keeper portraits for 3D depth (<code>🧊 +3D</code>).</li>
+          <li><strong>Phase 2 (Deep Optical Verification & Center 50% Crop):</strong> Automatically extracts a high-resolution <strong>Center 50% Crop</strong> to inspect subject sharpness. Accurately distinguishes genuine motion blur/camera shake from intentional shallow depth-of-field or soft background bokeh.</li>
+          <li><strong>⚡ Batch AI Auto-Correction (<code>Ctrl+Shift+A</code>):</strong> Automatically grades all keeper photos sequentially, estimating 3D depth maps, adjusting layers, and creating artistic multi-crop presets.</li>
+          <li><strong>🚀 1-Click Full Auto Workflow (<code>Ctrl+Shift+F</code>):</strong> Combines 2-phase culling, blur rejection, 3D depth estimation, and batch AI color grading into a single automated pipeline.</li>
+          <li><strong>⏩ Smart Resume & Skip (<code>chk_batch_skip_already_processed</code>):</strong> Instantly skips already processed & exported photos in ~40ms; fast-exports missing JPEGs in ~150ms from saved <code>.lumendeep</code> sidecars without wasting API tokens.</li>
+          <li><strong>🔄 Infinite 10-Second Retry Loop:</strong> Never drops or skips photos during API rate limits (<code>429 Resource Exhausted</code>) or network interruptions; pauses 10s and automatically retries until successful.</li>
+          <li><strong>📷 Optical Distortion Undistortion on 3D Neural Maps:</strong> Mode 2 geometric undistortion is applied to Depth Maps, Normal Maps, and Subject Masks, ensuring 100% pixel-perfect alignment and zero ghosting in 3D Bokeh.</li>
+        </ul>
+      </section>
+
+      <!-- Section: AI Neural Noise Reduction (NAFNet In-Memory) -->
+      <section id="ai-denoise">
+        <h2>16. AI Neural Noise Reduction (NAFNet In-Memory)</h2>
+        <p>Lumens Deep features an integrated deep learning image restoration engine powered by <strong>NAFNet (Nonlinear Activation Free Network)</strong>, pre-trained on real-world raw sensor noise benchmarks (SIDD, 40.30 dB PSNR). Unlike standard post-demosaic sRGB noise filters that blur fine details, Lumens Deep performs noise reduction <strong>in-memory directly on 32-bit linear floating-point sensor data</strong> prior to tone mapping and color grading.</p>
+
+        <!-- Interactive Split Wipe Comparison Demonstration -->
+        <div class="docs-screenshot-frame" style="padding: 12px; background: rgba(15, 23, 42, 0.6); border-radius: var(--radius-md); border: 1px solid var(--border-subtle); margin: 24px 0;">
+          <div style="font-weight: 600; font-size: 0.95rem; margin-bottom: 10px; color: var(--text-primary); display: flex; align-items: center; justify-content: space-between;">
+            <span>📸 Interactive Comparison: High-ISO RAW Sensor Noise vs. Lumens Deep NAFNet AI</span>
+            <span style="font-size: 0.8rem; color: #00e676; font-weight: normal;">Drag handle ⬌ to compare</span>
+          </div>
+
+          <div class="split-viewer-container" style="border-radius: var(--radius-sm); border: 1px solid rgba(255, 255, 255, 0.1);">
+            <div class="split-tag split-tag-left" style="background: rgba(220, 38, 38, 0.85); color: #fff;">Original Sensor RAW (High ISO)</div>
+            <div class="split-tag split-tag-right" style="background: rgba(0, 230, 118, 0.85); color: #000; font-weight: bold;">Lumens Deep NAFNet AI (Clean & Sharp)</div>
+            
+            <img src="assets/images/denoise_before.jpg" alt="High-ISO Sensor RAW with Noise" class="split-image split-image-before">
+            
+            <div class="split-image-after-wrapper">
+              <img src="assets/images/denoise_after.jpg" alt="Lumens Deep AI Denoised Result" class="split-image split-image-after">
+            </div>
+            
+            <div class="split-divider-line" style="box-shadow: 0 0 16px rgba(0, 230, 118, 0.8);"></div>
+            <div class="split-handle-knob" style="box-shadow: 0 0 16px rgba(0, 230, 118, 0.8); border-color: #00e676;">⬌</div>
+          </div>
+          <div class="docs-screenshot-caption">Figure 16.1 — High-ISO photo restoration: severe photon shot noise and chroma blotches are cleanly removed while text on cartons, elephant toy fleece, and cupcake icing retain tack-sharp micro-textures.</div>
+        </div>
+
+        <h3>Interactive Controls in the AI Assistant Dock:</h3>
+        <ul>
+          <li><strong>🔇 AI Denoise Current Photo (In-Memory):</strong> Instantly runs neural denoising on the currently open photo. The denoised linear floating-point data updates the GPU texture in real time without creating bulky intermediate files on disk.</li>
+          <li><strong>Strength Slider (0% to 100%, default 100%):</strong> Seamlessly controls the neural attenuation amount, allowing subtle blending between raw capture and complete noise erasure.</li>
+          <li><strong>Texture / Detail Retention Slider (0% to 100%, default 25%):</strong> Employs spatial frequency coring to preserve and re-inject natural, organic micro-textures and film grain, preventing the artificial "plastic skin" effect.</li>
+          <li><strong>Tile Size (512 / 1024):</strong> Partitions large 24MP–45MP images into overlapping patches blended with 2D Hann/cosine windows for zero edge seams.</li>
+          <li><strong>Model Architecture:</strong> Choose between <code>NAFNet-SIDD-width64.pth</code> (maximum reconstruction fidelity) and <code>NAFNet-SIDD-width32.pth</code> (high-speed lightweight inference).</li>
+          <li><strong>Save Denoised 16-bit Linear TIFF:</strong> Optional checkbox to write clean, uncompressed 16-bit linear TIFFs into <code>LumenDeep/</code> for downstream compositing.</li>
+        </ul>
+
+        <h3>⚡ Automated ISO Threshold Gating & Batch Resume:</h3>
+        <p>In high-volume workflows, running neural denoising on clean studio captures (ISO 100 on tripod) wastes time and computation. Lumens Deep solves this with intelligent ISO gating:</p>
+        <ul>
+          <li><strong>Auto-Denoise before export when ISO &gt; [200]:</strong> Automatically inspects raw hardware metadata (<code>raw.other.iso_speed</code>, EXIF 2.3+ <code>PhotographicSensitivity</code>). If the photo's ISO exceeds the threshold (default: 200), NAFNet executes in-memory immediately prior to rendering and exporting.</li>
+          <li><strong>Smart Resume &amp; Fast Export Integration:</strong> When re-exporting tuned photos with <em>"Skip already processed (Resume &amp; Export missing)"</em>, Lumens Deep verifies whether the photo was already denoised. If missing, it applies NAFNet in-memory and re-exports clean JPEGs without re-running Gemini AI prompts.</li>
+          <li><strong>Live Split Comparisons:</strong> Retains the pre-denoised capture as the reference source in memory. Pressing <code>V</code> (Split V), <code>H</code> (Split H), or <code>B</code> (Side-by-Side) allows instant real-time before/after comparison on the live canvas.</li>
+        </ul>
+      </section>
+
+      <!-- Section: Filmstrip & 3D Badges -->
+      <section id="filmstrip-features">
+        <h2>17. Resizable Filmstrip, Rating & 3D Depth Badges</h2>
+        <p>The bottom Filmstrip provides a smooth, asynchronous photo browser with smart status indicators:</p>
+        <ul>
+          <li><strong>Height Resize Handle:</strong> Drag the top divider to adjust thumbnail size dynamically from $100\text{px}$ up to $360\text{px}$.</li>
+          <li><strong><span style="color:#00e1ff; font-weight:bold;">✓ 3D</span> (Depth Ready Badge):</strong> Solid cyan/teal pill indicating a 16-bit depth map exists on disk in <code>{folder}/LumenDeep/</code>.</li>
+          <li><strong><span style="color:#ffa700; font-weight:bold;">🧊 +3D</span> (Depth Needed Badge):</strong> Amber outline indicating the photo is flagged as requiring 3D depth generation.</li>
+          <li><strong>Keyboard Rating:</strong> Press <code>1</code>–<code>5</code> for Star ratings, <code>X</code> for Reject, and <code>0</code> to clear.</li>
+          <li><strong>LumenDeep Subdirectory:</strong> Keeps your workspace pristine by storing all sidecars (<code>.lumendeep</code>), depth maps (<code>_depth.png</code>), normals (<code>_normals.png</code>), and subject masks (<code>_subject.png</code>) in the local <code>LumenDeep/</code> subfolder.</li>
+        </ul>
+      </section>
+
+      <!-- Section: FastMCP Server -->
+      <section id="mcp-server">
+        <h2>18. FastMCP Server Integration for AI Agents</h2>
+        <p>Lumens Deep features a native Model Context Protocol (MCP) server (<code>src/mcp_server.py</code>) for seamless integration with AI coding assistants and automation workflows:</p>
+        <ul>
+          <li><strong>Transport:</strong> Supports both stdio and Server-Sent Events (SSE) on <code>http://localhost:8000/sse</code>.</li>
+          <li><strong>Tools:</strong> <code>get_editor_state</code>, <code>apply_adjustments</code>, <code>get_viewport_image</code>, <code>get_image_crop</code>, and <code>get_histogram_stats</code>.</li>
+        </ul>
+      </section>
+
+      <!-- Section: Writing Custom Plugins -->
+      <section id="plugin-development">
+        <h2>19. How to Write a Custom Effect Plugin</h2>
+        <p>The plugin architecture allows you to create new GPU-accelerated filters with a single Python file:</p>
+
+        <pre><code>from src.plugins.base import BaseEffectPlugin
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QSlider, QLabel
+from PySide6.QtCore import Qt
+
+class FilmGrainPlugin(BaseEffectPlugin):
+    @property
+    def plugin_id(self) -> str:
+        return "film_grain"
+
+    @property
+    def display_name(self) -> str:
+        return "Film Grain"
+
+    @property
+    def category(self) -> str:
+        return "Effects"
+
+    def get_default_settings(self):
+        return {'grain_amount': 0}
+
+    def get_glsl_uniforms(self) -> str:
+        return "uniform float u_grain_amount;\n"
+
+    def get_glsl_functions(self) -> str:
+        return """
+        float hash_noise(vec2 co) {
+            return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
+        }
+        """
+
+    def get_glsl_execution(self) -> str:
+        return """
+        if (u_grain_amount > 0.0) {
+            float noise = (hash_noise(uv * 1000.0) - 0.5) * u_grain_amount * 0.15;
+            linear_rgb += vec3(noise);
+        }
+        """
+
+    def apply_uniforms(self, program, settings, engine):
+        if 'u_grain_amount' in program:
+            val = settings.get('grain_amount', 0) / 100.0
+            program['u_grain_amount'].value = float(val)
+
+    def create_widget(self, parent, on_changed):
+        w = QWidget(parent)
+        layout = QVBoxLayout(w)
+        slider = QSlider(Qt.Horizontal)
+        slider.setRange(0, 100)
+        slider.valueChanged.connect(on_changed)
+        w.slider = slider
+        layout.addWidget(QLabel("Grain Amount:"))
+        layout.addWidget(slider)
+        return w
+
+    def get_state(self, widget):
+        return {'grain_amount': widget.slider.value()}
+
+    def set_state(self, widget, state):
+        widget.slider.setValue(state.get('grain_amount', 0))
+
+    def reset_state(self, widget):
+        self.set_state(widget, self.get_default_settings())</code></pre>
+        <p>Save your file into <code>src/plugins/builtin/</code>. On launch, Lumens Deep discovers the plugin, registers it in the Layer Effects dock, and compiles its GLSL code into the rendering pipeline.</p>
+      </section>
+
+      <!-- Section: Exporting -->
+      <section id="export-sidecars">
+        <h2>20. Non-Destructive Sidecars & Aspect Subfolder Auto-Sorting</h2>
+        <ul>
+          <li><strong>Sidecar JSON (<code>Ctrl + S</code>):</strong> Saves all layer parameters, curve points, crop angles, notes, and mask metadata in a lightweight <code>.lumendeep</code> sidecar inside <code>LumenDeep/</code>.</li>
+          <li><strong>Dirty State Tracking & Save Prompts:</strong> Never silently overwrites project files during browsing; prompts with Save/Discard/Cancel when switching photos after manual edits.</li>
+          <li><strong>High-Resolution Export (<code>Ctrl + E</code>):</strong> Renders the full-resolution sensor capture with 16-bit float fidelity to TIFF, PNG, or JPEG.</li>
+        </ul>
+
+        <h3>📁 Aspect Ratio Subfolder Sorting & 5-Star Rule</h3>
+        <p>When batch exporting (via AI Auto-Export or Filmstrip context menu <strong>"Batch Export to JPEG 85%"</strong>), files and AI multi-crops are automatically categorized into structured subfolders:</p>
+        <ul>
+          <li>🖼️ <strong><code>./LDExport/Original/</code></strong> — Full-frame uncropped master images.</li>
+          <li>📱 <strong><code>./LDExport/Photo_iPad_4x5/</code></strong> — 4:5 vertical & 5:4 horizontal compositions.</li>
+          <li>🎞️ <strong><code>./LDExport/Portrait_2x3/</code></strong> — 2:3 vertical & 3:2 horizontal classic 35mm formats.</li>
+          <li>⏹️ <strong><code>./LDExport/Square_1x1/</code></strong> — 1:1 square feeds & avatars.</li>
+          <li>📐 <strong><code>./LDExport/Story_3x4/</code></strong> — 3:4 vertical & 4:3 stories.</li>
+          <li>🎬 <strong><code>./LDExport/Cinematic_16x9/</code></strong> — 16:9 widescreen & 9:16 vertical video crops.</li>
+        </ul>
+
+        <div class="docs-callout">
+          <div class="docs-callout-title">⭐ The 5-Star Curation Rule</div>
+          <p>Photos rated <strong>5★</strong> automatically save an extra master copy directly in the root <code>./LDExport/</code> folder for instant client delivery. Photos rated <strong>4★ and below</strong> remain cleanly organized in their respective aspect subfolders.</p>
+        </div>
+
+        <div class="docs-screenshot-frame">
+          <img src="assets/images/13_export_dialog.png" alt="16-Bit High Resolution Export Dialog" class="docs-screenshot-img" onerror="this.parentElement.style.display='none'">
+          <div class="docs-screenshot-caption">📸 Figure 19.1 — Non-destructive 16-bit high-resolution export dialog.</div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <div>© 2026 Lumens Deep Contributors. Released under the MIT License.</div>
+        <div><a href="index.html">← Return to Homepage</a> | <a href="shortcuts.html">Keyboard Shortcuts</a></div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

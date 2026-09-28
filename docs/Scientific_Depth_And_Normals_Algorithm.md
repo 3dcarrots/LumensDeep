@@ -26,6 +26,15 @@ where `s` is the least-squares scaling factor derived to match the local and glo
 ### 2.4. Cosine Blending and Outer Boundary Preservation
 Patches are stitched using a 2D cosine falloff window to ensure the Partition of Unity. However, applying a fade-out at the absolute outer borders of the image results in a zero-weight boundary. When subjected to subsequent frequency separation or blur, this 1-pixel black border bleeds inward (e.g., 32 pixels for a radius 63 blur), creating a dark frame around the entire photograph. We solve this by dynamically cropping the cosine ramp at the absolute image boundaries, clamping the outer weights to `1.0`.
 
+### 2.5. Heterogeneous GPU Acceleration & Batched TensorCore Inference
+To achieve real-time performance on ultra-high-resolution images (where a single photograph may decompose into 50–300 tiles), serial single-patch inference incurs severe latency and GPU starvation due to repeated host-device synchronizations.
+
+We introduce a heterogeneous execution architecture with **Batched TensorCore Dispatch**:
+1. **Dynamic Batching**: Slices adjacent 518x518 patches into unified 4D input tensors $(B, 3, 518, 518)$, where $B \in \{4, 8\}$.
+2. **CUDA FP16 Acceleration**: On NVIDIA GPUs, models run in half-precision floating point (`torch.float16`) on Tensor Cores, reducing tile processing time from $0.283\text{s}$ (CPU) to **$0.024\text{s}$** (NVIDIA RTX 4070 Laptop GPU), representing a **$\sim 12\times$ speedup**.
+3. **DirectML Fallback**: On non-NVIDIA Windows hardware (AMD Radeon, Intel Arc, Intel UHD/Iris), inference executes via DirectX 12 DirectML without requiring CUDA drivers.
+4. **Resilient VRAM Purging & CPU Safe Fallback**: In the event of an Out-Of-Memory exception (`torch.cuda.OutOfMemoryError`) or hardware driver timeout, the engine immediately purges GPU device caches (`torch.cuda.empty_cache()`, `gc.collect()`), transfers context to the multi-threaded CPU backend, and completes the frame with zero data loss.
+
 ## 3. Optimal Normal Map Generation
 
 Once a seamless, high-resolution depth map is assembled, extracting a mathematically accurate normal map presents unique challenges. Depth networks output disparity (inverse depth) rather than linear depth.

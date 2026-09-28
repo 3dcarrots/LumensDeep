@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  
+  <!-- Homepage -->
+  <url>
+    <loc>https://lumensdeep.com/</loc>
+    <lastmod>2026-08-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://lumensdeep.com/assets/images/og-image.jpg</image:loc>
+      <image:title>Lumens Deep — 32-Bit RAW Photo Editor &amp; 3D Relighting Studio</image:title>
+      <image:caption>Lumens Deep studio workspace overview with progressive 3D Bokeh and OKLCH color equalizers</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://lumensdeep.com/assets/images/01_workspace_overview.png</image:loc>
+      <image:title>Lumens Deep Professional Workspace</image:title>
+      <image:caption>Full 32-bit linear GPU workspace interface with layer stack and filmstrip browser</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://lumensdeep.com/assets/images/hero_after.jpg</image:loc>
+      <image:title>Lumens Deep 3D Bokeh Raymarched Portrait</image:title>
+      <image:caption>Processed camera RAW photo with progressive optical depth-of-field raymarching</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://lumensdeep.com/assets/images/sample_depth.jpg</image:loc>
+      <image:title>AI Metric Depth Estimation Map</image:title>
+      <image:caption>3D neural depth map extracted from single camera RAW frame for spatial depth of field</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://lumensdeep.com/assets/images/sample_normals.jpg</image:loc>
+      <image:title>Surface Normals Orientation Map</image:title>
+      <image:caption>High-frequency surface normals vector map (XYZ in RGB) for 3D scene relighting</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://lumensdeep.com/assets/images/sample_subject.jpg</image:loc>
+      <image:title>AI Alpha Matting Subject Mask</image:title>
+      <image:caption>Sub-pixel hairline segmentation alpha mask for foreground separation</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://lumensdeep.com/assets/images/volodymyr_makovetskyi.jpg</image:loc>
+      <image:title>Volodymyr Makovetskyi — Creator of Lumens Deep</image:title>
+      <image:caption>Lead Developer at 3DCoat and creator of Lumens Deep and Scanimat</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Documentation & User Guide -->
+  <url>
+    <loc>https://lumensdeep.com/docs.html</loc>
+    <lastmod>2026-08-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://lumensdeep.com/assets/images/01_workspace_overview.png</image:loc>
+      <image:title>Lumens Deep Interface Overview</image:title>
+      <image:caption>Workspace docks, filmstrip, and layer effects hierarchy</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://lumensdeep.com/assets/images/07_tone_equalizer_spline.png</image:loc>
+      <image:title>8-Band Luminance Zone Tone Equalizer</image:title>
+      <image:caption>Interactive EV spline curve across 8 exposure zones</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://lumensdeep.com/assets/images/08_color_equalizer_cards.png</image:loc>
+      <image:title>3-Way OKLCH Color Equalizer</image:title>
+      <image:caption>Per-hue saturation scaling, brightness offset, and chromatic rotation</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Keyboard & Mouse Shortcuts Reference -->
+  <url>
+    <loc>https://lumensdeep.com/shortcuts.html</loc>
+    <lastmod>2026-08-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+</urlset>

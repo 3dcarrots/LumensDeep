@@ -87,11 +87,22 @@ $$ \vec{UV}_{blue} = \vec{UV}_{base} + \vec{Shift} \times (1.0 - CA) $$
 
 ---
 
-## 6. Highlight Boost (Exponential Luma Weighting)
-For physically based rendering (HDR), bright areas in the out-of-focus background should form distinct bokeh contours. Since we operate on LDR (Low Dynamic Range) images, we artificially expand the dynamic range:
-During the final temporal blending of samples, the weight of each color is multiplied by a factor dependent on the pixel's brightness ($Luma$). If $Luma$ exceeds a given threshold (Highlight Threshold), the pixel's energy is amplified exponentially (Highlight Boost). This creates beautiful luminous rings (Ring Bokeh or Soap Bubble effect).
+## 7. Interactive 3D Focus Point Targeting & Automated A/B Verification
+
+### 7.1. Exact 3D Coordinate Raycast Depth Inversion
+To eliminate guesswork in finding the focal depth $Z_{focal}$, the engine implements an interactive inverse projective raycaster. When the user clicks on canvas point $(p_x, p_y)$ with the **3D Focus Picker Eyedropper**:
+1. Viewport Qt coordinates are transformed into Normalized Device Coordinates (NDC):
+   $$ n_x = \frac{p_x}{p_w} \times 2.0 - 1.0, \quad n_y = 1.0 - \frac{p_y}{p_h} \times 2.0 $$
+2. Inverted Model-View-Projection (MVP) matrix projects screen coordinates back into normalized texture UV space $(u, v) \in [0, 1]^2$.
+3. The 16-bit metric depth map is sampled at $(u, v)$ to retrieve the exact floating-point depth $Z_{target} = 1.0 - D(u, v)$ (where $0.0$ is the closest foreground sensor sensel and $1.0$ is the furthest background horizon).
+4. The bokeh focal plane $Z_{focal}$ is locked to $Z_{target} \times 100\%$, instantaneously ensuring that the clicked face or feature is tack-sharp.
+
+### 7.2. Automated AI Bokeh A/B Verification
+To prevent accidental defocusing of portrait subjects during automated multi-pass AI development:
+- The engine captures two distinct convergence frames: $I_{bokeh}$ (with Monte Carlo raymarched depth of field) and $I_{sharp}$ (unblurred pinhole capture).
+- Gemini 3.7 Flash evaluates both frames side-by-side using high-scrutiny multimodal perception. If the subject's face is judged to be softer than the natural baseline, Bokeh is automatically disengaged to preserve portrait integrity.
 
 ---
 
-## 7. Conclusions
-The implemented **Screen-Space Raymarching** algorithm with **Zero-Crossing** search is a revolutionary approach to real-time Depth of Field rendering. It mathematically resolves depth bleeding artifacts, enabling physically plausible bokeh rendering that accounts for complex lens geometry, stochastic accumulation, and spatial optical aberrations—all without the need for multi-pass scene sorting.
+## 8. Conclusions
+The implemented **Screen-Space Raymarching** algorithm with **Zero-Crossing** search, combined with interactive **3D Coordinate Raycast Focus Point Locking** and **Automated AI A/B Verification**, represents a revolutionary approach to real-time Depth of Field rendering. It mathematically resolves depth bleeding artifacts, enabling physically plausible bokeh rendering that accounts for complex lens geometry, stochastic accumulation, and spatial optical aberrations—all without the need for multi-pass scene sorting.

@@ -13,7 +13,10 @@ env/
 
 # Environment Variables & Keys
 .env
-.env.local
+.env.*
+*.env
+**/.env
+!.env.example
 
 # IDE & Editor files
 .vscode/
@@ -21,12 +24,11 @@ env/
 *.swp
 *.swo
 
-# Temporary scratch & test artifacts
-scratch/*.png
-scratch/*.jpg
-scratch/*.tif
-scratch/*.tiff
-scratch/*.json
+# Temporary scratch, tests & backup directories
+scratch/
+*_backup*/
+src_backup*/
+*.bak
 
 # Large model weights (if downloaded externally)
 *.onnx

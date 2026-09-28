@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Sitemap definition
+Sitemap: https://lumensdeep.com/sitemap.xml

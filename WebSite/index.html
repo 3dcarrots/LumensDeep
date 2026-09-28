@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: https://ogp.me/ns#">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  
+  <!-- Primary SEO Meta Tags -->
+  <title>Lumens Deep — 32-Bit Linear RAW Photo Editor & 3D Relighting Studio</title>
+  <meta name="title" content="Lumens Deep — 32-Bit Linear RAW Photo Editor & 3D Relighting Studio">
+  <meta name="description" content="Professional open-source 32-bit floating-point RAW photo editor and computational relighting studio. Features real-time 3D progressive Bokeh raymarching, neural depth & surface normal maps, 8-band luminance zone tone curves, and OKLCH color grading with ModernGL.">
+  <meta name="keywords" content="RAW photo editor, 3D bokeh raymarching, computational photography, neural depth estimation, surface normals relighting, OKLCH color equalizer, 32-bit floating point image editor, ModernGL Python photo editor, open source Lightroom alternative, non-destructive RAW developer">
+  <meta name="author" content="Volodymyr Makovetskyi">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta name="theme-color" content="#00d2ff">
+  <link rel="canonical" href="https://lumensdeep.com/">
+
+  <!-- Favicon & Mobile Web App Manifest -->
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/images/android-chrome-192x192.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/images/apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
+  <meta name="apple-mobile-web-app-title" content="Lumens Deep">
+  <meta name="application-name" content="Lumens Deep">
+  <meta name="msapplication-TileColor" content="#080a12">
+
+  <!-- Open Graph / Facebook / LinkedIn / Discord -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Lumens Deep">
+  <meta property="og:url" content="https://lumensdeep.com/">
+  <meta property="og:title" content="Lumens Deep — 32-Bit RAW Photo Editor & 3D Relighting Studio">
+  <meta property="og:description" content="Next-generation 32-bit floating-point RAW editor with progressive 3D optical Bokeh raymarching, neural depth & surface normals spatial relighting, and OKLCH color grading.">
+  <meta property="og:image" content="https://lumensdeep.com/assets/images/og-image.jpg">
+  <meta property="og:image:secure_url" content="https://lumensdeep.com/assets/images/og-image.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Lumens Deep 32-Bit Linear RAW Photo Editor Workspace and 3D Raymarching Studio">
+  <meta property="og:locale" content="en_US">
+
+  <!-- Twitter / X Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://lumensdeep.com/">
+  <meta name="twitter:title" content="Lumens Deep — 32-Bit RAW Photo Editor & 3D Relighting Studio">
+  <meta name="twitter:description" content="Non-destructive 32-bit linear RAW photo editing with real-time progressive 3D Bokeh raymarching, neural surface normals relighting, and modular GPU plugins.">
+  <meta name="twitter:image" content="https://lumensdeep.com/assets/images/og-image.jpg">
+  <meta name="twitter:image:alt" content="Lumens Deep Studio Workspace and Computational Photography Engine">
+
+  <!-- Google Fonts Preconnect & Stylesheets -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- JSON-LD Structured Data: SoftwareApplication & WebSite & FAQPage -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://lumensdeep.com/#software",
+        "name": "Lumens Deep",
+        "url": "https://lumensdeep.com/",
+        "image": "https://lumensdeep.com/assets/images/og-image.jpg",
+        "screenshot": "https://lumensdeep.com/assets/images/01_workspace_overview.png",
+        "description": "Lumens Deep is a professional open-source, non-destructive 32-bit floating-point RAW photo editor and 3D computational relighting studio powered by ModernGL, Python, and PySide6.",
+        "applicationCategory": "MultimediaApplication",
+        "applicationSubCategory": "PhotoEditor",
+        "operatingSystem": "Windows 10+, Linux, macOS",
+        "softwareVersion": "1.0.0",
+        "license": "https://opensource.org/licenses/MIT",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock"
+        },
+        "author": {
+          "@type": "Person",
+          "name": "Volodymyr Makovetskyi",
+          "jobTitle": "Lead Developer at 3DCoat & Creator of Lumens Deep",
+          "url": "https://lumensdeep.com/#about-creator",
+          "sameAs": [
+            "https://github.com/3dcarrots",
+            "https://lumensdeep.com/"
+          ]
+        },
+        "featureList": [
+          "32-Bit Linear Floating-Point GPU Pipeline (Zero banding, unlimited dynamic range)",
+          "Progressive 3D Optical Bokeh Raymarching with customizable iris blades (3 to 10 blades)",
+          "AI 3D Neural Maps: Metric depth estimation and high-frequency surface normals",
+          "Directional 3D Scene Relighting using surface normal vectors (XYZ in RGB)",
+          "Sub-pixel AI Subject Matting and Hairline Segmentation",
+          "8-Band Luminance Zone Tone Equalizer with interactive EV cubic splines",
+          "3-Way OKLCH Color Equalizer (Hue shift, Saturation scaling, Brightness offset)",
+          "Non-destructive GPU Layer Stack with hardware blend modes and interactive brush masking",
+          "Full RAW Format Support: Canon CR2/CR3, Nikon NEF, Sony ARW, DNG, TIFF, EXR, JPEG",
+          "Fast thumbnail caching, multi-format export (16-bit TIFF, 32-bit EXR, JPEG, PNG)"
+        ],
+        "downloadUrl": "https://github.com/3dcarrots/LumensDeep"
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://lumensdeep.com/#website",
+        "url": "https://lumensdeep.com/",
+        "name": "Lumens Deep Official Website",
+        "description": "Official portal and documentation for Lumens Deep 32-Bit RAW Photo Editor & 3D Relighting Studio.",
+        "publisher": {
+          "@type": "Person",
+          "name": "Volodymyr Makovetskyi"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://lumensdeep.com/#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What makes Lumens Deep different from traditional RAW editors like Lightroom or Darktable?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Lumens Deep processes sensor data completely in 32-bit floating-point linear color space on the GPU using ModernGL. Beyond standard 2D color grading, it incorporates 3D neural depth maps and surface normals to perform true optical depth-of-field Bokeh raymarching and directional 3D scene relighting from single 2D camera RAW captures."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is Lumens Deep free and open-source?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes, Lumens Deep is 100% free and open-source under the MIT license, created by Volodymyr Makovetskyi (Lead Developer at 3DCoat)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does 3D Bokeh raymarching work in Lumens Deep?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Lumens Deep calculates the Circle of Confusion (CoC) per pixel based on focal depth and lens geometry. Using a progressive stochastic raymarching shader on the GPU, it samples background and foreground discs with true optical aperture shapes (from 3 vintage triangular blades to 10 creamy circular blades) and realistic highlight boosting."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What RAW file formats are supported?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Lumens Deep supports all major camera RAW formats via rawpy/LibRaw including Canon (.CR2, .CR3), Nikon (.NEF), Sony (.ARW), Fujifilm (.RAF), Adobe Digital Negative (.DNG), as well as 16/32-bit TIFF, OpenEXR, PNG, and JPEG."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do I enable NVIDIA GPU hardware acceleration for AI depth & normal maps?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Install PyTorch with CUDA 12.6 support via: `pip install torch torchvision --index-url https://download.pytorch.org/whl/cu126 --upgrade`. This accelerates 3D depth and normal map calculation by ~12x using Tensor Cores and FP16 batched inference on NVIDIA RTX/GTX GPUs. AMD and Intel users can enable DirectX 12 acceleration via `pip install onnxruntime-directml`. Safe Mode with automatic CPU fallback is also included to ensure 100% stability."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the OKLCH color model used in Lumens Deep?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "OKLCH is a perceptually uniform color space where lightness (L), chroma (C), and hue (H) are mathematically decoupled according to human visual perception. Adjusting hue or saturation in Lumens Deep does not cause unintended brightness shifts or clipping artifacts."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+
+  <!-- Navigation Header -->
+  <header class="site-header" id="site-header">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo" id="brand-logo-link">
+        <div class="brand-logo-icon">📸</div>
+        <span>Lumens Deep</span>
+      </a>
+      
+      <ul class="nav-links">
+        <li><a href="#features" class="nav-link">Features</a></li>
+        <li><a href="#bokeh-showcase" class="nav-link">3D Bokeh</a></li>
+        <li><a href="#ai-maps" class="nav-link">Neural 3D Maps</a></li>
+        <li><a href="#plugins" class="nav-link">Plugins</a></li>
+        <li><a href="#about-creator" class="nav-link">About Creator</a></li>
+        <li><a href="docs.html" class="nav-link">Documentation</a></li>
+        <li><a href="shortcuts.html" class="nav-link">Shortcuts</a></li>
+      </ul>
+      
+      <div class="nav-actions">
+        <a href="https://github.com/3dcarrots/LumensDeep" target="_blank" class="btn btn-secondary btn-sm" id="btn-github-nav">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+          GitHub
+        </a>
+        <a href="#download" class="btn btn-primary btn-sm" id="btn-get-started-nav">Get Lumens Deep</a>
+        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle Menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section with Interactive Split Viewer -->
+  <section class="hero-section" id="hero">
+    <div class="container">
+      <div class="hero-badge">
+        <span>✨ Powered by ModernGL 32-Bit Linear Pipeline & Neural 3D Geometry</span>
+      </div>
+      
+      <h1 class="hero-title">
+        The Future of RAW Photography is <span class="gradient-text">Three-Dimensional</span>
+      </h1>
+      
+      <p class="hero-description">
+        Experience professional, non-destructive 32-bit floating-point RAW editing with real-time progressive 3D Bokeh raymarching, neural surface normals relighting, and modular GPU shader plugins.
+      </p>
+      
+      <div class="hero-cta-group">
+        <a href="#download" class="btn btn-primary btn-lg" id="btn-hero-download">
+          ⚡ Download & Quickstart
+        </a>
+        <a href="docs.html" class="btn btn-secondary btn-lg" id="btn-hero-docs">
+          📖 Read Documentation
+        </a>
+      </div>
+      
+      <!-- Full Application Workspace Preview -->
+      <div class="hero-workspace-wrapper" id="hero-workspace">
+        <div class="app-window-frame">
+          <div class="window-titlebar">
+            <div class="window-dots">
+              <span class="window-dot dot-close"></span>
+              <span class="window-dot dot-min"></span>
+              <span class="window-dot dot-max"></span>
+            </div>
+            <div class="window-title">
+              <span>📷</span> Lumens Deep — Studio Workspace (32-Bit Linear GPU Pipeline)
+            </div>
+            <div class="window-badges">
+              <span class="window-badge">ModernGL 32-Bit</span>
+              <span class="window-badge">3D Raymarching</span>
+            </div>
+          </div>
+          <div class="window-body">
+            <img src="assets/images/01_workspace_overview.png" alt="Lumens Deep Full Pro Studio Workspace Interface" class="workspace-screenshot" loading="eager">
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Before / After Split Demo -->
+      <div class="hero-split-section" style="margin-top: 70px;">
+        <div style="text-align: center; margin-bottom: 24px;">
+          <span class="section-subtitle" style="font-size: 0.85rem; letter-spacing: 2px;">Interactive Raymarching Demo</span>
+          <h3 style="font-size: 1.85rem; font-weight: 700; margin-top: 6px;">Sensor RAW vs. Lumens Deep 3D Bokeh</h3>
+          <p style="color: var(--text-secondary); max-width: 620px; margin: 8px auto 0; font-size: 0.95rem;">Drag the interactive divider below to see how progressive 32-bit raymarching transforms flat sensor captures into rich cinematic portraits.</p>
+        </div>
+
+        <div class="hero-demo-wrapper" id="hero-demo">
+          <div class="split-viewer-container" id="hero-split-container">
+            <div class="split-tag split-tag-left">Original Flat RAW Sensor</div>
+            <div class="split-tag split-tag-right">Lumens Deep 3D Bokeh & OKLCH Grade</div>
+            
+            <img src="assets/images/hero_before.jpg" alt="Original Unprocessed Camera RAW" class="split-image split-image-before">
+            
+            <div class="split-image-after-wrapper" id="split-after-wrapper">
+              <img src="assets/images/hero_after.jpg" alt="Lumens Deep Processed 3D Render" class="split-image split-image-after">
+            </div>
+            
+            <div class="split-divider-line" id="split-divider"></div>
+            <div class="split-handle-knob" id="split-handle">⬌</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive AI Neural Noise Reduction Split Demo -->
+      <div class="hero-split-section" style="margin-top: 60px;">
+        <div style="text-align: center; margin-bottom: 24px;">
+          <span class="section-subtitle" style="font-size: 0.85rem; letter-spacing: 2px; color: #00e676;">Deep Learning Image Restoration Demo</span>
+          <h3 style="font-size: 1.85rem; font-weight: 700; margin-top: 6px;">High-ISO Sensor Noise vs. NAFNet In-Memory Denoise</h3>
+          <p style="color: var(--text-secondary); max-width: 660px; margin: 8px auto 0; font-size: 0.95rem;">Drag the divider below to inspect true in-memory 32-bit linear restoration. Heavy photon shot noise and chrominance grain are completely removed while text, edges, and organic micro-textures stay tack-sharp.</p>
+        </div>
+
+        <div class="hero-demo-wrapper" id="denoise-demo">
+          <div class="split-viewer-container" id="denoise-split-container">
+            <div class="split-tag split-tag-left" style="background: rgba(220, 38, 38, 0.85); color: #fff;">Original Sensor RAW (High ISO)</div>
+            <div class="split-tag split-tag-right" style="background: rgba(0, 230, 118, 0.85); color: #000; font-weight: bold;">Lumens Deep NAFNet AI Denoise (Clean & Sharp)</div>
+            
+            <img src="assets/images/denoise_before.jpg" alt="Original Unprocessed High-ISO RAW Sensor with Noise" class="split-image split-image-before">
+            
+            <div class="split-image-after-wrapper" id="denoise-split-after-wrapper">
+              <img src="assets/images/denoise_after.jpg" alt="Lumens Deep NAFNet AI In-Memory Denoised Photo" class="split-image split-image-after">
+            </div>
+            
+            <div class="split-divider-line" style="box-shadow: 0 0 16px rgba(0, 230, 118, 0.8);"></div>
+            <div class="split-handle-knob" style="box-shadow: 0 0 16px rgba(0, 230, 118, 0.8); border-color: #00e676;">⬌</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Features Grid -->
+  <section class="section" id="features">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-subtitle">Core Pillars</div>
+        <h2 class="section-title">Engineered for Extreme Fidelity</h2>
+        <p class="section-desc">Designed from the ground up for high-dynamic-range camera sensors, computational photography researchers, and discerning portrait photographers.</p>
+      </div>
+      
+      <div class="features-grid">
+        <!-- Feature 0: AI Neural Noise Reduction (NAFNet-SIDD In-Memory) -->
+        <div class="feature-card" style="border-color: rgba(0, 230, 118, 0.3); background: linear-gradient(135deg, rgba(0, 230, 118, 0.05), rgba(15, 20, 30, 0.8));">
+          <div class="feature-icon-box" style="background: rgba(0, 230, 118, 0.15); color: #00e676;">🔇</div>
+          <h3 class="feature-title">AI Neural Denoising (NAFNet-SIDD In-Memory)</h3>
+          <p class="feature-desc">State-of-the-art Nonlinear Activation Free Network pre-trained on SIDD (40.30 dB PSNR). Denoises 32-bit linear sensor data directly in-memory before tone mapping, eliminating Poisson-Gaussian shot noise while preserving organic skin pores, eyelashes, and fabric micro-textures via spatial cosine-blended tiling.</p>
+        </div>
+
+        <!-- Feature 1: Gemini AI Assistant & One-Time Prompts -->
+        <div class="feature-card" style="border-color: rgba(0, 210, 255, 0.3); background: linear-gradient(135deg, rgba(0, 210, 255, 0.05), rgba(15, 20, 30, 0.8));">
+          <div class="feature-icon-box" style="background: rgba(0, 210, 255, 0.15); color: #00d2ff;">🧠</div>
+          <h3 class="feature-title">Gemini 3.7 Flash AI & One-Time Prompts</h3>
+          <p class="feature-desc">Interactive multimodal co-pilot with deep Thinking reasoning. Features separated Studio Retouching Rules, instant One-Time Prompts (with auto-clear & quick chips), 50% dampened convergence, and AI Bokeh A/B verification.</p>
+        </div>
+
+        <!-- Feature 2: 2-Phase AI Culling & Batch Automation -->
+        <div class="feature-card" style="border-color: rgba(255, 167, 0, 0.3); background: linear-gradient(135deg, rgba(255, 167, 0, 0.05), rgba(15, 20, 30, 0.8));">
+          <div class="feature-icon-box" style="background: rgba(255, 167, 0, 0.15); color: #ffa700;">🎯</div>
+          <h3 class="feature-title">2-Phase AI Culling & Resilient Batch Automation</h3>
+          <p class="feature-desc">Phase 1 rapid triage and Phase 2 Center 50% Crop optical blur inspection. Includes 1-Click Full Auto Batch grading with resilient 10s persistent retry, automated ISO > 200 denoise, and smart skip resume.</p>
+        </div>
+
+        <!-- Feature 3: 32-Bit Linear GPU Pipeline & RAW Mipmaps -->
+        <div class="feature-card">
+          <div class="feature-icon-box">🚀</div>
+          <h3 class="feature-title">32-Bit Linear GPU & Hardware Anti-Aliasing</h3>
+          <p class="feature-desc">All calculations run on 32-bit floating-point buffers in ModernGL. Hardware trilinear mipmap pyramids eliminate sensel aliasing, moiré, and downsampling noise on 45MP Canon CR3 / Sony ARW files.</p>
+        </div>
+        
+        <!-- Feature 4: 3D Bokeh Raymarching & 3D Focus Picker -->
+        <div class="feature-card">
+          <div class="feature-icon-box">✨</div>
+          <h3 class="feature-title">3D Bokeh & Interactive Focus Picker</h3>
+          <p class="feature-desc">True optical depth-of-field simulation using Monte Carlo Vogel spiral raymarching. Includes one-click <strong>3D Canvas Focus Eyedropper</strong>, cat-eye vignetting, chromatic aberration, and polygonal iris blades.</p>
+        </div>
+        
+        <!-- Feature 5: Aspect Ratio Subfolders & Fast Viewer Mode -->
+        <div class="feature-card">
+          <div class="feature-icon-box">🎞️</div>
+          <h3 class="feature-title">Aspect Subfolder Sorting & Fast Viewer</h3>
+          <p class="feature-desc">Auto-slices exports into dedicated aspect subfolders (Original, Photo_iPad_4x5, Portrait_2x3, Square_1x1, Story_3x4, Cinematic_16x9) with 5★ master curation, plus sub-50ms instant Fast Viewer browsing.</p>
+        </div>
+        
+        <!-- Feature 6: OKLCH Tone & Color Equalizers -->
+        <div class="feature-card">
+          <div class="feature-icon-box">📊</div>
+          <h3 class="feature-title">OKLCH Tone & Color Equalizers</h3>
+          <p class="feature-desc">Targeted 8-band luminance and hue adjustments in perceptual OKLCH color space. Brighten deep shadows or tone skies without unwanted saturation shifts.</p>
+        </div>
+        
+        <!-- Feature 7: Sub-Pixel GPU Brush Masking -->
+        <div class="feature-card">
+          <div class="feature-icon-box">🖌️</div>
+          <h3 class="feature-title">Sub-Pixel GPU Brush Masking</h3>
+          <p class="feature-desc">Hand-paint masks with hardware-accelerated stroke interpolation. Rapid mouse sweeps produce smooth, continuous lines with zero gaps or stepping.</p>
+        </div>
+        
+        <!-- Feature 8: GPU AI Acceleration -->
+        <div class="feature-card" style="border-color: rgba(0, 210, 255, 0.3); background: linear-gradient(135deg, rgba(0, 210, 255, 0.05), rgba(15, 20, 30, 0.8));">
+          <div class="feature-icon-box" style="background: rgba(0, 210, 255, 0.15); color: #00d2ff;">⚡</div>
+          <h3 class="feature-title">NVIDIA CUDA & DirectML AI Speedup</h3>
+          <p class="feature-desc">Heterogeneous GPU acceleration for DepthAnythingV2. Batched FP16 TensorCore inference delivers <strong>~12x faster depth maps (0.024s/tile)</strong> with DirectML and Safe Mode CPU fallback.</p>
+        </div>
+
+        <!-- Feature 9: FastMCP Server -->
+        <div class="feature-card">
+          <div class="feature-icon-box">🔌</div>
+          <h3 class="feature-title">FastMCP Server for AI Agents</h3>
+          <p class="feature-desc">Built-in Model Context Protocol server (SSE & stdio on port 8000) allowing external AI coding assistants to inspect histograms, extract crops, and apply live adjustments.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive 3D Neural Maps Section -->
+  <section class="section" id="ai-maps" style="background: rgba(255,255,255,0.015);">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-subtitle">AI & Computational Relighting</div>
+        <h2 class="section-title">See Your Photos in Full 3D Space</h2>
+        <p class="section-desc">Lumens Deep automatically extracts spatial depth and surface geometry, turning flat 2D sensor data into interactive 3D volumetric scenes.</p>
+      </div>
+      
+      <div class="maps-showcase">
+        <div class="maps-tab-bar">
+          <button class="map-tab-btn active" data-map-type="original" id="tab-map-orig">Rendered Photo</button>
+          <button class="map-tab-btn" data-map-type="depth" id="tab-map-depth">3D Depth Map [D]</button>
+          <button class="map-tab-btn" data-map-type="normals" id="tab-map-normals">Surface Normals [N]</button>
+          <button class="map-tab-btn" data-map-type="subject" id="tab-map-subject">Subject Matting [S]</button>
+        </div>
+        
+        <div class="maps-view-container">
+          <div class="map-display-frame">
+            <img src="assets/images/hero_after.jpg" alt="3D Neural Map View" class="map-display-img" id="map-display-img">
+          </div>
+          
+          <div class="map-info-content">
+            <span class="map-info-badge">Spatial Feature</span>
+            <h3 class="map-info-title" id="map-info-title">Full 32-Bit Linear RGB Render</h3>
+            <p class="map-info-desc" id="map-info-desc">The complete non-destructive render with custom OKLCH tone curves, color balance, and hardware-accelerated ModernGL layer accumulation.</p>
+            <div class="map-key-shortcut" id="map-key-shortcut">
+              <span>Quick Key:</span>
+              <span class="kbd-badge">Original Output</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Bokeh & Aperture Blades Playground -->
+  <section class="section" id="bokeh-showcase">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-subtitle">Aperture Blade Geometry</div>
+        <h2 class="section-title">Shape Your Out-of-Focus Highlights</h2>
+        <p class="section-desc">Choose between vintage polygonal iris blades or ultra-smooth modern circular lenses.</p>
+      </div>
+      
+      <div class="bokeh-playground">
+        <div class="aperture-visualizer-canvas">
+          <canvas id="aperture-canvas" width="300" height="300"></canvas>
+        </div>
+        
+        <div class="bokeh-controls-panel">
+          <h3 style="font-size: 1.5rem; font-weight: 700;">Select Aperture Blade Count</h3>
+          <p style="color: var(--text-secondary);" id="blade-shape-name">5 Blades — Pentagon (Classic Hollywood Bokeh)</p>
+          
+          <div class="blade-button-group">
+            <button class="blade-btn" data-blades="3">3 (Triangle)</button>
+            <button class="blade-btn" data-blades="4">4 (Square)</button>
+            <button class="blade-btn active" data-blades="5">5 (Pentagon)</button>
+            <button class="blade-btn" data-blades="6">6 (Hexagon)</button>
+            <button class="blade-btn" data-blades="8">8 (Octagon)</button>
+            <button class="blade-btn" data-blades="10">Circular (Smooth)</button>
+          </div>
+          
+          <div style="margin-top: 10px;">
+            <p style="font-size: 0.9rem; color: var(--text-muted);">In Lumens Deep, slider position 0 creates a triangle, position 1 creates a square, ..., and position 10 delivers creamy circular bokeh.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Tone Spline Playground -->
+  <section class="section" id="tone-sandbox" style="background: rgba(255,255,255,0.015);">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-subtitle">Real-Time WebGL Demo</div>
+        <h2 class="section-title">Interactive 8-Band OKLCH Tone Equalizer</h2>
+        <p class="section-desc">Drag the control points on the curve to see live 32-bit linear GPU tone corrections applied to the RAW photo in real time!</p>
+      </div>
+      
+      <div class="tone-sandbox-grid">
+        <!-- Left: Live WebGL Photo Canvas -->
+        <div class="tone-sandbox-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <span style="font-size: 0.9rem; font-weight: 600; color: #fff;">📸 Live 32-Bit Linear WebGL Render</span>
+            <button class="btn btn-secondary btn-sm" id="btn-tone-compare" style="font-size: 0.75rem; padding: 3px 10px;">👁 Hold for Original</button>
+          </div>
+          
+          <div class="tone-photo-container">
+            <div class="tone-photo-badge">⚡ 60 FPS GPU Shader</div>
+            <canvas id="tone-webgl-canvas" width="640" height="480" class="tone-photo-canvas"></canvas>
+          </div>
+
+          <div class="tone-photo-toolbar">
+            <div style="font-size: 0.8rem; color: var(--text-muted);">
+              Sample: <em>Canon EOS R5 • 32-Bit Linear Sensor Pipeline</em>
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <button class="btn btn-primary btn-sm" id="btn-photo-sample-1" style="font-size: 0.75rem; padding: 2px 8px;">Landscape</button>
+              <button class="btn btn-secondary btn-sm" id="btn-photo-sample-2" style="font-size: 0.75rem; padding: 2px 8px;">Portrait</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Interactive Curve Editor & Presets -->
+        <div class="tone-sandbox-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <span style="font-size: 0.9rem; font-weight: 600; color: #00d2ff;">🎛️ 8-Band OKLCH Spline Control</span>
+            <span style="font-size: 0.75rem; color: var(--text-muted);" id="tone-active-preset-name">Custom Curve</span>
+          </div>
+
+          <div style="position: relative; width: 100%; flex: 1; display: flex; align-items: center;">
+            <canvas id="tone-spline-canvas" width="600" height="240" style="width: 100%; height: auto; border-radius: 8px; cursor: crosshair; touch-action: none; display: block;"></canvas>
+          </div>
+          
+          <!-- Preset Controls & Reset -->
+          <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 14px;" id="tone-spline-presets">
+            <button class="btn btn-secondary btn-sm" data-preset="flat">Flat (0 EV)</button>
+            <button class="btn btn-secondary btn-sm" data-preset="shadow-lift">Shadow Lift</button>
+            <button class="btn btn-secondary btn-sm" data-preset="s-curve">S-Curve Contrast</button>
+            <button class="btn btn-secondary btn-sm" data-preset="highlight-recovery">Highlight Recovery</button>
+          </div>
+          
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 12px; text-align: center;">
+            💡 <strong>Drag</strong> any of the 8 points up/down to shape the tone curve. <strong>Double-click</strong> to reset to 0 EV.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Color Equalizer WebGL Playground -->
+  <section class="section" id="color-sandbox" style="background: rgba(0, 210, 255, 0.015); border-top: 1px solid rgba(255,255,255,0.04);">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-subtitle">OKLCH Color Grading Studio</div>
+        <h2 class="section-title">Interactive 3-Mode Color Equalizer</h2>
+        <p class="section-desc">Sculpt colors in perceptual OKLCH color space. Selectively boost or mute saturation, adjust hue brightness, or shift color spectrums with 0% skin-tone artifacting.</p>
+      </div>
+      
+      <div class="tone-sandbox-grid">
+        <!-- Left: Live WebGL Photo Canvas -->
+        <div class="tone-sandbox-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <span style="font-size: 0.9rem; font-weight: 600; color: #fff;">🎨 Live OKLCH GPU Grading</span>
+            <button class="btn btn-secondary btn-sm" id="btn-color-compare" style="font-size: 0.75rem; padding: 3px 10px;">👁 Hold for Original</button>
+          </div>
+          
+          <div class="tone-photo-container">
+            <div class="tone-photo-badge">⚡ Real-Time OKLCH Shader</div>
+            <canvas id="color-webgl-canvas" width="640" height="480" class="tone-photo-canvas"></canvas>
+          </div>
+
+          <div class="tone-photo-toolbar">
+            <div style="font-size: 0.8rem; color: var(--text-muted);">
+              Perceptual Color Space: <em>OKLCH • Constant Perceived Chroma</em>
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <button class="btn btn-primary btn-sm" id="btn-color-sample-1" style="font-size: 0.75rem; padding: 2px 8px;">Landscape</button>
+              <button class="btn btn-secondary btn-sm" id="btn-color-sample-2" style="font-size: 0.75rem; padding: 2px 8px;">Portrait</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: 3-Mode Spline Editor (Saturation / Brightness / Hue) & Presets -->
+        <div class="tone-sandbox-card">
+          <!-- 3 Mode Tabs -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; gap: 8px; flex-wrap: wrap;">
+            <div class="btn-group" id="color-eq-tabs" style="display: flex; background: rgba(0,0,0,0.4); padding: 3px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+              <button class="btn btn-sm btn-primary" data-mode="saturation" style="font-size: 0.75rem; padding: 4px 10px;">Saturation</button>
+              <button class="btn btn-sm btn-secondary" data-mode="brightness" style="font-size: 0.75rem; padding: 4px 10px;">Brightness</button>
+              <button class="btn btn-sm btn-secondary" data-mode="hue" style="font-size: 0.75rem; padding: 4px 10px;">Hue Shift</button>
+            </div>
+            <span style="font-size: 0.75rem; color: #00d2ff;" id="color-active-preset-name">Saturation Mode</span>
+          </div>
+
+          <div style="position: relative; width: 100%; flex: 1; display: flex; align-items: center;">
+            <canvas id="color-spline-canvas" width="600" height="240" style="width: 100%; height: auto; border-radius: 8px; cursor: crosshair; touch-action: none; display: block;"></canvas>
+          </div>
+          
+          <!-- Mode-Specific Preset Controls -->
+          <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 14px;" id="color-spline-presets">
+            <button class="btn btn-secondary btn-sm" data-preset="reset">Reset</button>
+            <button class="btn btn-secondary btn-sm" data-preset="mute-greens">Mute Greens</button>
+            <button class="btn btn-secondary btn-sm" data-preset="autumn-foliage">Autumn Foliage</button>
+            <button class="btn btn-secondary btn-sm" data-preset="deep-sky">Deep Blue Sky</button>
+            <button class="btn btn-secondary btn-sm" data-preset="teal-orange">Teal & Orange</button>
+          </div>
+          
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 12px; text-align: center;" id="color-mode-tip">
+            💡 <strong>Saturation Mode</strong>: Drag points to selectively boost or desaturate specific hues across the spectrum.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Comparison Matrix -->
+  <section class="section" id="comparison">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-subtitle">Feature Matrix</div>
+        <h2 class="section-title">How Lumens Deep Compares</h2>
+        <p class="section-desc">A modern, open-source computational photography workstation built for the next generation of visual artists.</p>
+      </div>
+      
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Feature / Capability</th>
+              <th class="highlight-col"><span class="gradient-text">Lumens Deep</span></th>
+              <th>Adobe Lightroom</th>
+              <th>Darktable</th>
+              <th>Capture One</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Non-Destructive 32-Bit Float Engine</strong></td>
+              <td class="highlight-col"><span class="check-icon">✓</span> Native ModernGL</td>
+              <td><span class="check-icon">✓</span> ProPhoto</td>
+              <td><span class="check-icon">✓</span> 32-bit float</td>
+              <td><span class="check-icon">✓</span> Native</td>
+            </tr>
+            <tr>
+              <td><strong>In-Memory Neural RAW Denoising (NAFNet-SIDD)</strong></td>
+              <td class="highlight-col"><span class="check-icon">✓</span> In-Memory 32-bit Linear</td>
+              <td><span class="cross-icon">⚠️</span> Slow DNG generation</td>
+              <td><span class="cross-icon">✗</span> Non-local means / Wavelet</td>
+              <td><span class="cross-icon">✗</span> Conventional Bilateral</td>
+            </tr>
+            <tr>
+              <td><strong>Progressive 3D Bokeh Raymarching</strong></td>
+              <td class="highlight-col"><span class="check-icon">✓</span> Full Optical GPU</td>
+              <td><span class="cross-icon">✗</span> 2D Blur Filter</td>
+              <td><span class="cross-icon">✗</span> None</td>
+              <td><span class="cross-icon">✗</span> None</td>
+            </tr>
+            <tr>
+              <td><strong>Offline Neural 3D Normals & Depth</strong></td>
+              <td class="highlight-col"><span class="check-icon">✓</span> Built-in ONNX</td>
+              <td><span class="cross-icon">✗</span> Cloud/Limited</td>
+              <td><span class="cross-icon">✗</span> None</td>
+              <td><span class="cross-icon">✗</span> None</td>
+            </tr>
+            <tr>
+              <td><strong>Aperture Blade Shape Geometry (3-12 Blades)</strong></td>
+              <td class="highlight-col"><span class="check-icon">✓</span> Configurable</td>
+              <td><span class="cross-icon">✗</span> Fixed</td>
+              <td><span class="cross-icon">✗</span> None</td>
+              <td><span class="cross-icon">✗</span> None</td>
+            </tr>
+            <tr>
+              <td><strong>Perceptual OKLCH Tone & Color Equalizers</strong></td>
+              <td class="highlight-col"><span class="check-icon">✓</span> Native OKLCH</td>
+              <td><span class="cross-icon">✗</span> Standard HSL</td>
+              <td><span class="check-icon">✓</span> Color Calibration</td>
+              <td><span class="cross-icon">✗</span> Standard HSL</td>
+            </tr>
+            <tr>
+              <td><strong>Sub-Pixel GPU Brush Stroke Interpolation</strong></td>
+              <td class="highlight-col"><span class="check-icon">✓</span> Zero Gaps</td>
+              <td><span class="check-icon">✓</span> Available</td>
+              <td><span class="cross-icon">✗</span> Stepped</td>
+              <td><span class="check-icon">✓</span> Available</td>
+            </tr>
+            <tr>
+              <td><strong>Extensible Python / GLSL Plugin System</strong></td>
+              <td class="highlight-col"><span class="check-icon">✓</span> 1-File Plugins</td>
+              <td><span class="cross-icon">✗</span> Closed</td>
+              <td><span class="check-icon">✓</span> Lua Scripts</td>
+              <td><span class="cross-icon">✗</span> AppleScript only</td>
+            </tr>
+            <tr>
+              <td><strong>Open Source & Free Forever</strong></td>
+              <td class="highlight-col"><span class="check-icon">✓</span> MIT License</td>
+              <td><span class="cross-icon">✗</span> Subscription</td>
+              <td><span class="check-icon">✓</span> GPLv3</td>
+              <td><span class="cross-icon">✗</span> $299+</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Meet the Creator Section -->
+  <section class="section" id="about-creator">
+    <div class="container">
+      <div class="creator-section">
+        <div class="creator-grid">
+          
+          <!-- Creator Avatar & Credentials Column -->
+          <div class="creator-avatar-column">
+            <div class="creator-avatar-frame">
+              <img src="assets/images/volodymyr_makovetskyi.jpg" alt="Volodymyr Makovetskyi — Creator of Lumens Deep" class="creator-avatar-img">
+            </div>
+            
+            <h3 class="creator-name">Volodymyr Makovetskyi</h3>
+            <div class="creator-title-tag">Creator & Lead Architect</div>
+            
+            <div class="creator-badges-list">
+              <div class="creator-pill">
+                <span>⚡</span>
+                <span>Lead Developer at <strong>3DCoat</strong></span>
+              </div>
+              <div class="creator-pill">
+                <span>🔬</span>
+                <span>Creator of <strong>Scanimat</strong></span>
+              </div>
+              <div class="creator-pill">
+                <span>⏳</span>
+                <span><strong>20+ Years</strong> in 3D Graphics</span>
+              </div>
+            </div>
+            
+            <div class="creator-social-links">
+              <a href="https://github.com/3dcarrots" target="_blank" class="creator-social-btn" title="GitHub (@3dcarrots)">
+                <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+              </a>
+              <a href="https://www.youtube.com/@3dcarrots" target="_blank" class="creator-social-btn" title="YouTube Channel">
+                <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M8.051 1.999h.089c.822.003 4.987.033 6.11.335a2.01 2.01 0 0 1 1.415 1.42c.101.38.172.883.22 1.402l.01.104.022.26.008.104c.065.914.073 1.77.074 1.957v.075c-.001.194-.01 1.108-.082 2.06l-.008.105-.022.26-.01.104c-.048.519-.119 1.023-.22 1.402a2.007 2.007 0 0 1-1.415 1.42c-1.16.312-5.569.334-6.18.335h-.142c-.309 0-1.587-.006-2.927-.052l-.17-.006-.087-.004-.171-.007-.171-.007c-1.11-.049-2.167-.128-2.654-.26a2.007 2.007 0 0 1-1.415-1.419c-.111-.417-.185-.986-.235-1.558L.09 9.82l-.008-.104A31.4 31.4 0 0 1 0 7.68v-.123c.002-.215.01-.958.064-1.778l.007-.103.022-.26.01-.104c.048-.519.119-1.023.22-1.402a2.007 2.007 0 0 1 1.415-1.42c.487-.13 1.544-.21 2.654-.26l.17-.007.172-.006.086-.003.171-.007A99.788 99.788 0 0 1 7.858 2h.193zM6.4 5.209v4.818l4.157-2.408L6.4 5.209z"/></svg>
+              </a>
+              <a href="https://scanimat.com/" target="_blank" class="creator-social-btn" title="Scanimat Technology">
+                <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zM5.5 4h5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 .5-.5z"/></svg>
+              </a>
+              <a href="https://www.linkedin.com/in/volodymyr-makovetskyi-212531177/" target="_blank" class="creator-social-btn" title="LinkedIn Profile">
+                <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.479 0 14.854V1.146zm4.943 12.248V6.169H2.542v7.225h2.401zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248-.822 0-1.359.54-1.359 1.248 0 .694.521 1.248 1.327 1.248h.016zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016a5.54 5.54 0 0 1 .016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225h2.4z"/></svg>
+              </a>
+            </div>
+          </div>
+          
+          <!-- Creator Manifesto & Story Column -->
+          <div class="creator-manifesto-content">
+            <div class="section-subtitle" style="text-align: left;">Behind the Code</div>
+            <h2 class="creator-quote-header">
+              “Every RAW photo is a 3D scene waiting to be unlocked — not just a flat grid of pixels.”
+            </h2>
+            
+            <p class="creator-story-p">
+              Hi, I’m <strong>Volodymyr Makovetskyi</strong>. As the Lead Developer of <strong>3DCoat</strong> and creator of <strong>Scanimat</strong> technology (<a href="https://scanimat.com/" target="_blank">scanimat.com</a>, <a href="https://scanimate.io/" target="_blank">scanimate.io</a>), my journey in 3D computer graphics began back in <strong>1995</strong>, with over 20 years of commercial engineering experience spanning from early 3D model architectures to high-end real-time GPU rendering engines.
+            </p>
+            
+            <p class="creator-story-p">
+              I originally began building <strong>Lumens Deep</strong> as a personal hobby project to edit family photos with the quality, optical realism, and depth fidelity I always dreamed of. Traditional industry editors like Adobe Lightroom, Capture One, and Darktable are fantastic for flat 2D color grading, but none of them generate ultra-precise <strong>40MP+ metric depth maps</strong> where every single pixel aligns perfectly with RAW sensor resolution. None of them allow you to treat a capture as a living 3D environment — isolating depth planes, relighting surfaces via high-frequency surface normals, or computing genuine optical bokeh raymarching with customizable aperture blade geometry.
+            </p>
+            
+            <div class="creator-highlight-box">
+              <div class="creator-highlight-title">
+                <span>🤖</span>
+                <span>The Lumens Deep AI Philosophy: Authenticity Over Hallucination</span>
+              </div>
+              <p style="font-size: 0.95rem; line-height: 1.65; color: var(--text-secondary); margin: 0;">
+                Lumens Deep was purposefully engineered for the next era of <strong>AI Agent collaboration via the Model Context Protocol (MCP)</strong>. Unlike generative diffusion tools that hallucinate and redraw over your photos, AI agents in Lumens Deep act as precision studio assistants — they analyze and adjust the native GPU sliders, OKLCH curves, and 3D geometric masks without ever painting over or compromising your photograph’s genuine optical authenticity.
+              </p>
+            </div>
+            
+            <p class="creator-story-p">
+              I am sharing Lumens Deep with the global photography and developer community as a <strong>100% free and open-source project (MIT License)</strong>. It is built to give visual artists total creative freedom, without subscriptions, walled gardens, or cloud dependencies.
+            </p>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Download & Quickstart Card -->
+  <section class="section" id="download">
+    <div class="container">
+      <div class="download-card">
+        <h2 style="font-size: 2.4rem; font-weight: 800; margin-bottom: 16px;">Ready to Elevate Your Photos?</h2>
+        <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto 24px; font-size: 1.1rem;">
+          Get started with Lumens Deep in less than 60 seconds on Windows, macOS, or Linux.
+        </p>
+        
+        <div class="code-box">
+          <span id="cmd-install">git clone https://github.com/3dcarrots/LumensDeep.git && cd LumensDeep && pip install -r requirements.txt</span>
+          <button class="copy-btn" data-target="cmd-install" id="btn-copy-install">Copy</button>
+        </div>
+
+        <div style="margin-top: 14px;">
+          <p style="font-size: 0.85rem; color: #00d2ff; margin-bottom: 6px; font-weight: 600;">⚡ NVIDIA GPU Acceleration (~12x faster AI depth & normals):</p>
+          <div class="code-box">
+            <span id="cmd-cuda">pip install torch torchvision --index-url https://download.pytorch.org/whl/cu126 --upgrade</span>
+            <button class="copy-btn" data-target="cmd-cuda" id="btn-copy-cuda">Copy</button>
+          </div>
+        </div>
+        
+        <div style="margin-top: 14px;">
+          <div class="code-box" style="max-width: 380px;">
+            <span id="cmd-run">python src/gui/main_window.py</span>
+            <button class="copy-btn" data-target="cmd-run" id="btn-copy-run">Copy</button>
+          </div>
+        </div>
+        
+        <div style="margin-top: 36px; display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
+          <a href="https://github.com/3dcarrots/LumensDeep" target="_blank" class="btn btn-primary btn-lg" id="btn-dl-github">
+            ⭐ Star on GitHub
+          </a>
+          <a href="docs.html" class="btn btn-secondary btn-lg" id="btn-dl-docs">
+            📖 Complete Documentation
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="brand-logo">
+            <div class="brand-logo-icon">📸</div>
+            <span>Lumens Deep</span>
+          </div>
+          <p>Next-generation 32-bit floating-point RAW photo editor and 3D neural relighting studio.</p>
+        </div>
+        
+        <div class="footer-column">
+          <h4>Documentation</h4>
+          <ul class="footer-links">
+            <li><a href="docs.html#getting-started">Getting Started</a></li>
+            <li><a href="docs.html#raw-engine">RAW Engine & Colors</a></li>
+            <li><a href="docs.html#3d-bokeh">3D Bokeh Raymarching</a></li>
+            <li><a href="docs.html#plugin-guide">Plugin API Guide</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h4>Quick Reference</h4>
+          <ul class="footer-links">
+            <li><a href="shortcuts.html">Keyboard Shortcuts</a></li>
+            <li><a href="docs.html#masking">GPU Masking Guide</a></li>
+            <li><a href="docs.html#ai-maps">3D Neural Maps</a></li>
+            <li><a href="docs.html#export">16-Bit Exporting</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-column">
+          <h4>Project & License</h4>
+          <ul class="footer-links">
+            <li><a href="https://github.com/3dcarrots/LumensDeep" target="_blank">GitHub Repository</a></li>
+            <li><a href="https://github.com/3dcarrots/LumensDeep/issues" target="_blank">Bug Tracker</a></li>
+            <li><a href="https://github.com/3dcarrots/LumensDeep/blob/main/LICENSE" target="_blank">MIT License</a></li>
+            <li><a href="https://lumensdeep.com/">lumensdeep.com</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <div>© 2026 Lumens Deep Contributors. Released under the permissive MIT License.</div>
+        <div>Engineered with Python, ModernGL & PySide6.</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/sample_data.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

@@ -115,7 +115,7 @@ class AboutDialog(QDialog):
         title_layout = QVBoxLayout()
         title_layout.setSpacing(2)
 
-        title_lbl = QLabel("Lumens Deep <span style='color:#58a6ff; font-size:13px; font-weight:normal;'>v1.0.0 Production Release</span>")
+        title_lbl = QLabel("Lumens Deep <span style='color:#58a6ff; font-size:13px; font-weight:normal;'>v0.1.0 Alpha</span>")
         title_lbl.setStyleSheet("font-size: 20px; font-weight: 800; color: #ffffff;")
         title_layout.addWidget(title_lbl)
 

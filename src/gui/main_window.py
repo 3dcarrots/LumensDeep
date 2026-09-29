@@ -215,7 +215,15 @@ class PhotoEditorWindow(QMainWindow):
 
         # 1. Initialize Plugin Manager & GPU Engine
         self.plugin_manager = PluginManager()
-        shader_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'shaders')
+        
+        # Robust shader directory discovery (works in dev mode & PyInstaller frozen bundle)
+        base_dir = getattr(sys, '_MEIPASS', os.path.dirname(sys.executable)) if getattr(sys, 'frozen', False) else os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        shader_candidates = [
+            os.path.join(base_dir, 'shaders'),
+            os.path.join(base_dir, 'src', 'shaders'),
+            os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'shaders'),
+        ]
+        shader_dir = next((c for c in shader_candidates if os.path.exists(c)), shader_candidates[0])
         vs_path = os.path.join(shader_dir, 'vertex.glsl')
         fs_path = os.path.join(shader_dir, 'fragment.glsl')
         self.engine = PhotoEngine(vs_path, fs_path, plugin_manager=self.plugin_manager)
@@ -1871,11 +1879,55 @@ class PhotoEditorWindow(QMainWindow):
         self._update_view()
 
     def _rotate_left_90(self):
+        # Rotate crop sliders CCW so any active crop rectangle tracks the image content
+        cl = self.slider_crop_l.value()
+        cr = self.slider_crop_r.value()
+        ct = self.slider_crop_t.value()
+        cb = self.slider_crop_b.value()
+        if cl or cr or ct or cb:
+            self.slider_crop_l.blockSignals(True)
+            self.slider_crop_r.blockSignals(True)
+            self.slider_crop_t.blockSignals(True)
+            self.slider_crop_b.blockSignals(True)
+            self.slider_crop_l.setValue(ct)
+            self.slider_crop_r.setValue(cb)
+            self.slider_crop_t.setValue(cr)
+            self.slider_crop_b.setValue(cl)
+            self.slider_crop_l.blockSignals(False)
+            self.slider_crop_r.blockSignals(False)
+            self.slider_crop_t.blockSignals(False)
+            self.slider_crop_b.blockSignals(False)
+            self.engine.crop_l = ct / 1000.0
+            self.engine.crop_r = cb / 1000.0
+            self.engine.crop_t = cr / 1000.0
+            self.engine.crop_b = cl / 1000.0
         self.engine.rotate_left_90()
         self.flip_90 = self.engine.flip_90
         self._update_view()
 
     def _rotate_right_90(self):
+        # Rotate crop sliders CW so any active crop rectangle tracks the image content
+        cl = self.slider_crop_l.value()
+        cr = self.slider_crop_r.value()
+        ct = self.slider_crop_t.value()
+        cb = self.slider_crop_b.value()
+        if cl or cr or ct or cb:
+            self.slider_crop_l.blockSignals(True)
+            self.slider_crop_r.blockSignals(True)
+            self.slider_crop_t.blockSignals(True)
+            self.slider_crop_b.blockSignals(True)
+            self.slider_crop_l.setValue(cb)
+            self.slider_crop_r.setValue(ct)
+            self.slider_crop_t.setValue(cl)
+            self.slider_crop_b.setValue(cr)
+            self.slider_crop_l.blockSignals(False)
+            self.slider_crop_r.blockSignals(False)
+            self.slider_crop_t.blockSignals(False)
+            self.slider_crop_b.blockSignals(False)
+            self.engine.crop_l = cb / 1000.0
+            self.engine.crop_r = ct / 1000.0
+            self.engine.crop_t = cl / 1000.0
+            self.engine.crop_b = cr / 1000.0
         self.engine.rotate_right_90()
         self.flip_90 = self.engine.flip_90
         self._update_view()
@@ -2001,16 +2053,20 @@ class PhotoEditorWindow(QMainWindow):
                     combo.setCurrentText(text)
                     combo.blockSignals(False)
 
-        ratio, name = parse_aspect_ratio_text(text, self.engine.width, self.engine.height)
+        eff_w = self.engine.height if self.flip_90 % 2 == 1 else self.engine.width
+        eff_h = self.engine.width if self.flip_90 % 2 == 1 else self.engine.height
+        ratio, name = parse_aspect_ratio_text(text, eff_w, eff_h)
         self.image_label.set_crop_aspect_ratio(ratio, name)
 
-        if ratio is not None and self.engine.width > 0 and self.engine.height > 0:
+        if ratio is not None and eff_w > 0 and eff_h > 0:
             self._fit_crop_to_aspect(ratio)
         self._sync_current_crop_to_active_preset()
 
     def _fit_crop_to_aspect(self, ratio: float):
         """Fits and centers the crop sliders (l, r, t, b) to match the specified aspect ratio."""
-        if ratio <= 0 or self.engine.width <= 0 or self.engine.height <= 0:
+        eff_w = self.engine.height if self.flip_90 % 2 == 1 else self.engine.width
+        eff_h = self.engine.width if self.flip_90 % 2 == 1 else self.engine.height
+        if ratio <= 0 or eff_w <= 0 or eff_h <= 0:
             return
 
         cl = self.slider_crop_l.value()
@@ -2019,7 +2075,7 @@ class PhotoEditorWindow(QMainWindow):
         cb = self.slider_crop_b.value()
 
         new_l, new_r, new_t, new_b = enforce_crop_aspect_ratio(
-            cl, cr, ct, cb, self.engine.width, self.engine.height, ratio, allow_orientation_flip=False
+            cl, cr, ct, cb, eff_w, eff_h, ratio, allow_orientation_flip=False
         )
 
         self.slider_crop_l.setValue(new_l)
@@ -5687,7 +5743,7 @@ class PhotoEditorWindow(QMainWindow):
         except Exception as e:
             QMessageBox.information(
                 self, "About Lumens Deep",
-                f"Lumens Deep v1.0.0 Production Release\n"
+                f"Lumens Deep v0.1.0 Alpha\n"
                 f"Developed by Volodymyr Makovetskyi\n\n"
                 f"32-Bit Linear RAW Photo Studio & 3D Neural Relighting Suite\n"
                 f"https://lumensdeep.com"

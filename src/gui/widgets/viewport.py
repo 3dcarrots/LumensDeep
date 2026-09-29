@@ -146,10 +146,21 @@ class ImagePreviewLabel(QLabel):
         if not eng.texture or eng.width <= 0 or eng.height <= 0:
             return None, 0, 0, 0, 0
 
-        angle_rad = np.radians(eng.rotation_deg - 90 * eng.flip_90)
-        c, s = np.cos(angle_rad), np.sin(angle_rad)
-        W_bound = eng.width * abs(c) + eng.height * abs(s)
-        H_bound = eng.width * abs(s) + eng.height * abs(c)
+        # Effective base dimensions after orthogonal flips (flip_90: 0, 1, 2, 3 * 90 deg)
+        if eng.flip_90 % 2 == 1:
+            W_flip, H_flip = float(eng.height), float(eng.width)
+        else:
+            W_flip, H_flip = float(eng.width), float(eng.height)
+
+        r_flip = (W_flip / float(H_flip)) if H_flip > 0 else 1.0
+
+        # Fine horizon straighten angle (excluding the 90-degree orthogonal steps)
+        gamma = np.radians(eng.rotation_deg)
+        c_g = abs(np.cos(gamma))
+        s_g = abs(np.sin(gamma))
+
+        W_bound = W_flip * c_g + H_flip * s_g
+        H_bound = W_flip * s_g + H_flip * c_g
         
         eff_prev_w = (eng.prev_w // 2) if getattr(eng, 'split_view_mode', None) == 'side_by_side' else eng.prev_w
         eff_prev_h = eng.prev_h
@@ -177,17 +188,20 @@ class ImagePreviewLabel(QLabel):
         photo_x = center_x - (photo_w / 2.0)
         photo_y = center_y - (photo_h / 2.0)
         
-        r = (eng.width / float(eng.height)) if eng.height > 0 else 1.0
-        denom1 = r * abs(c) + abs(s)
-        denom2 = abs(c) + r * abs(s)
-        if denom1 > 1e-7 and denom2 > 1e-7:
-            h_ins = min(eng.width / denom1, eng.height / denom2)
-            w_ins = r * h_ins
+        # Compute maximum inscribed rectangle to auto-crop empty black corners upon Horizon Straightening
+        if abs(eng.rotation_deg) > 1e-4:
+            denom1 = r_flip * c_g + s_g
+            denom2 = c_g + r_flip * s_g
+            if denom1 > 1e-7 and denom2 > 1e-7:
+                h_ins = min(W_flip / denom1, H_flip / denom2)
+                w_ins = r_flip * h_ins
+            else:
+                w_ins, h_ins = W_flip, H_flip
+            auto_margin_x = max(0.0, min(0.499, (W_bound - w_ins) / (2.0 * W_bound))) if W_bound > 0 else 0.0
+            auto_margin_y = max(0.0, min(0.499, (H_bound - h_ins) / (2.0 * H_bound))) if H_bound > 0 else 0.0
         else:
-            w_ins, h_ins = eng.width, eng.height
-            
-        auto_margin_x = max(0.0, min(0.499, (W_bound - w_ins) / (2.0 * W_bound))) if W_bound > 0 else 0.0
-        auto_margin_y = max(0.0, min(0.499, (H_bound - h_ins) / (2.0 * H_bound))) if H_bound > 0 else 0.0
+            auto_margin_x = 0.0
+            auto_margin_y = 0.0
 
         crop_l = self.main_window.slider_crop_l.value() / 1000.0 if hasattr(self.main_window, 'slider_crop_l') else 0.0
         crop_r = self.main_window.slider_crop_r.value() / 1000.0 if hasattr(self.main_window, 'slider_crop_r') else 0.0

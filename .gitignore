@@ -11,6 +11,12 @@ venv/
 ENV/
 env/
 
+# Build and Installer Artifacts
+build/
+dist/
+output/
+*.spec.bak
+
 # Environment Variables & Keys
 .env
 .env.*

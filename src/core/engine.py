@@ -968,7 +968,7 @@ class PhotoEngine:
         if W <= 0 or H <= 0:
             return
 
-        if getattr(self, 'is_passthrough', False):
+        if getattr(self, 'is_passthrough', False) and self.flip_90 == 0 and abs(self.rotation_deg) < 1e-4 and self.crop_l == 0 and self.crop_r == 0 and self.crop_t == 0 and self.crop_b == 0:
             # In passthrough mode (e.g. displaying rendered _preview.jpg or camera JPEG preview),
             # the image has already been cropped/rendered or is displayed 1:1.
             # We strictly preserve the texture's native aspect ratio with zero distortion!
@@ -995,78 +995,91 @@ class PhotoEngine:
             eff_out_w, eff_out_h = self.out_w, self.out_h
         else:
             # Standard RAW / Layered edit pipeline with interactive crop & rotation
-            # For OpenGL where Y is up, but our texture is mapped Top=y=-1
-            # Positive angle_rad rotates CCW visually
-            angle_rad = np.radians(self.rotation_deg - 90 * self.flip_90)
-            c, s = np.cos(angle_rad), np.sin(angle_rad)
-            
-            W_bound = W * abs(c) + H * abs(s)
-            H_bound = W * abs(s) + H * abs(c)
-            
-            # Compute maximum inscribed rectangle to auto-crop empty black corners upon Straighten / Rotation
-            r = (W / float(H)) if H > 0 else 1.0
-            denom1 = r * abs(c) + abs(s)
-            denom2 = abs(c) + r * abs(s)
-            if denom1 > 1e-7 and denom2 > 1e-7:
-                h_ins = min(W / denom1, H / denom2)
-                w_ins = r * h_ins
+            # Effective base dimensions after orthogonal flips (flip_90: 0, 1, 2, 3 * 90 deg)
+            if self.flip_90 % 2 == 1:
+                W_flip, H_flip = float(H), float(W)
             else:
-                w_ins, h_ins = W, H
-                
-            auto_margin_x = max(0.0, min(0.499, (W_bound - w_ins) / (2.0 * W_bound))) if W_bound > 0 else 0.0
-            auto_margin_y = max(0.0, min(0.499, (H_bound - h_ins) / (2.0 * H_bound))) if H_bound > 0 else 0.0
-            
+                W_flip, H_flip = float(W), float(H)
+
+            r_flip = (W_flip / float(H_flip)) if H_flip > 0 else 1.0
+
+            # Fine horizon straighten angle (excluding the 90-degree orthogonal steps)
+            gamma = np.radians(self.rotation_deg)
+            c_g = abs(np.cos(gamma))
+            s_g = abs(np.sin(gamma))
+
+            # Bounding box dimensions of the rotated image in the scene
+            W_bound = W_flip * c_g + H_flip * s_g
+            H_bound = W_flip * s_g + H_flip * c_g
+
+            # Compute maximum inscribed rectangle to auto-crop empty black corners upon Horizon Straightening
+            if abs(self.rotation_deg) > 1e-4:
+                denom1 = r_flip * c_g + s_g
+                denom2 = c_g + r_flip * s_g
+                if denom1 > 1e-7 and denom2 > 1e-7:
+                    h_ins = min(W_flip / denom1, H_flip / denom2)
+                    w_ins = r_flip * h_ins
+                else:
+                    w_ins, h_ins = W_flip, H_flip
+                auto_margin_x = max(0.0, min(0.499, (W_bound - w_ins) / (2.0 * W_bound))) if W_bound > 0 else 0.0
+                auto_margin_y = max(0.0, min(0.499, (H_bound - h_ins) / (2.0 * H_bound))) if H_bound > 0 else 0.0
+            else:
+                auto_margin_x = 0.0
+                auto_margin_y = 0.0
+
             eff_crop_l = auto_margin_x + self.crop_l * (1.0 - 2.0 * auto_margin_x)
             eff_crop_r = auto_margin_x + self.crop_r * (1.0 - 2.0 * auto_margin_x)
             eff_crop_t = auto_margin_y + self.crop_t * (1.0 - 2.0 * auto_margin_y)
             eff_crop_b = auto_margin_y + self.crop_b * (1.0 - 2.0 * auto_margin_y)
-            
-            self.out_w = int(W_bound * (1.0 - eff_crop_l - eff_crop_r))
-            self.out_h = int(H_bound * (1.0 - eff_crop_t - eff_crop_b))
-            
-            # Prevent zero or negative size
-            self.out_w = max(1, self.out_w)
-            self.out_h = max(1, self.out_h)
-            
+
+            self.out_w = max(1, int(round(W_bound * (1.0 - eff_crop_l - eff_crop_r))))
+            self.out_h = max(1, int(round(H_bound * (1.0 - eff_crop_t - eff_crop_b))))
+
             cx = (W_bound / 2.0) * (eff_crop_l - eff_crop_r)
             cy = (H_bound / 2.0) * (eff_crop_t - eff_crop_b)
-            
+
+            # Total rotation angle (incorporating both fine straighten and 90-degree flips)
+            # For OpenGL where Y is up, but our texture is mapped Top=y=-1
+            # Positive angle_rad rotates CCW visually
+            total_angle_rad = np.radians(self.rotation_deg - 90 * self.flip_90)
+            c, s = np.cos(total_angle_rad), np.sin(total_angle_rad)
+
             S_img = np.array([
                 [W/2, 0, 0, 0],
                 [0, H/2, 0, 0],
                 [0, 0, 1, 0],
                 [0, 0, 0, 1]
             ], dtype='f4')
-            
+
             R = np.array([
                 [c, -s, 0, 0],
                 [s,  c, 0, 0],
                 [0,  0, 1, 0],
                 [0,  0, 0, 1]
             ], dtype='f4')
-            
+
             T_crop = np.array([
                 [1, 0, 0, -cx],
                 [0, 1, 0, -cy],
                 [0, 0, 1, 0],
                 [0, 0, 0, 1]
             ], dtype='f4')
-            
+
             S_crop = np.array([
                 [2.0/self.out_w, 0, 0, 0],
                 [0, 2.0/self.out_h, 0, 0],
                 [0, 0, 1, 0],
                 [0, 0, 0, 1]
             ], dtype='f4')
-            
+
             # Base matrix for cropping and rotating the image
             MVP_base = S_crop @ T_crop @ R @ S_img
             self.MVP_export = MVP_base
-            
+
             # Determine whether preview displays the full rotated frame (for interactive crop editing)
             if getattr(self, 'is_crop_interactive_mode', False):
-                out_w_prev = max(1, int(W_bound))
-                out_h_prev = max(1, int(H_bound))
+                out_w_prev = max(1, int(round(W_bound)))
+                out_h_prev = max(1, int(round(H_bound)))
                 T_crop_prev = np.eye(4, dtype='f4')
                 S_crop_prev = np.array([
                     [2.0/out_w_prev, 0, 0, 0],

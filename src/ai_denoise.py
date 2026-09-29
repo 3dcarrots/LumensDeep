@@ -29,15 +29,19 @@ class RawDenoiser:
     Operates directly in RAM (In-Memory) on linear RGB images from RAW or standard formats,
     with optional 16-bit linear TIFF export and EXIF metadata preservation.
     """
-    def __init__(self, model_path="models/NAFNet-SIDD-width64.pth", device='cuda', tile_size=512, overlap=64):
+    def __init__(self, model_path="models/NAFNet-SIDD-width64.pth", device='cuda', tile_size=512, overlap=64, status_callback=None):
         self.device = 'cuda' if torch.cuda.is_available() and device == 'cuda' else 'cpu'
         self.tile_size = tile_size
         self.overlap = overlap
         
         # Look for weights (prioritizing high-capacity width64)
         found_weights = None
+        base_dir = getattr(sys, '_MEIPASS', os.path.dirname(sys.executable)) if getattr(sys, 'frozen', False) else os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         candidates = [
             model_path,
+            os.path.join(base_dir, model_path) if model_path else None,
+            os.path.join(base_dir, "models", "NAFNet-SIDD-width64.pth"),
+            os.path.join(base_dir, "models", "NAFNet-SIDD-width32.pth"),
             os.path.join("models", "NAFNet-SIDD-width64.pth"),
             os.path.join(os.path.dirname(__file__), "..", "models", "NAFNet-SIDD-width64.pth"),
             os.path.join(os.path.dirname(__file__), "models", "NAFNet-SIDD-width64.pth"),
@@ -52,6 +56,19 @@ class RawDenoiser:
                 found_weights = candidate
                 break
                 
+        # On-demand download from Hugging Face if not bundled locally
+        if not found_weights:
+            target_file = "NAFNet-SIDD-width64.pth" if "width64" in str(model_path) else "NAFNet-SIDD-width32.pth"
+            if status_callback:
+                status_callback(f"Downloading {target_file} from Hugging Face (one-time setup)...")
+            try:
+                from huggingface_hub import hf_hub_download
+                print(f"[RawDenoiser] Weights not found locally. Downloading {target_file} from Hugging Face...")
+                found_weights = hf_hub_download(repo_id="nyanko7/nafnet-models", filename=target_file)
+                print(f"[RawDenoiser] Successfully cached weights at: {found_weights}")
+            except Exception as e:
+                print(f"[RawDenoiser] Failed to auto-download {target_file}: {e}")
+
         self.width = 64
         if found_weights:
             try:

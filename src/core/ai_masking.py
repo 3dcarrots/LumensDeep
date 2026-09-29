@@ -1,8 +1,19 @@
 import subprocess
 import sys
 import os
+import tempfile
 import numpy as np
 from PIL import Image
+
+# Static imports for PyInstaller frozen bundle discovery
+try:
+    import transformers.models.depth_anything.modeling_depth_anything
+    import transformers.models.depth_anything.configuration_depth_anything
+    import transformers.models.segformer.modeling_segformer
+    import transformers.models.segformer.configuration_segformer
+    import diffusers.pipelines.marigold.pipeline_marigold_normals
+except ImportError:
+    pass
 
 def _get_local_model_path(repo_id: str) -> str:
     try:
@@ -41,6 +52,11 @@ class AIMaskGenerator:
 
     def ensure_dependencies(self, progress_callback=None):
         """Check and install required packages."""
+        # In a frozen standalone Windows application (.exe), packages cannot and must not be pip-installed,
+        # and calling sys.executable would accidentally launch a second instance of LumensDeep.exe!
+        if getattr(sys, 'frozen', False):
+            return
+
         missing = []
         try:
             import torch
@@ -232,7 +248,8 @@ class AIMaskGenerator:
                 model_id=model_path,
                 disable_gpu=disable_gpu,
                 hardware_mode=hardware_mode,
-                input_size=(518, 518)
+                input_size=(518, 518),
+                progress_callback=progress_callback
             )
             self.models[key] = engine
         return self.models[key]
@@ -588,9 +605,31 @@ class AIMaskGenerator:
         import torch
         from diffusers import MarigoldNormalsPipeline
         
-        if progress_callback: progress_callback("Loading Marigold Normals Pipeline...")
-        
         if 'marigold_normals' not in self.models:
+            model_path = _get_local_model_path("prs-eth/marigold-normals-v1-1")
+            
+            # Check if Marigold weights need to be downloaded from Hugging Face
+            is_marigold_cached = False
+            try:
+                from pathlib import Path
+                from huggingface_hub.constants import HF_HUB_CACHE
+                folder_name = "models--" + "prs-eth/marigold-normals-v1-1".replace("/", "--")
+                cache_dir = Path(HF_HUB_CACHE) / folder_name / "snapshots"
+                if cache_dir.exists():
+                    for snap in cache_dir.iterdir():
+                        if (snap / "unet").exists() or (snap / "model_index.json").exists():
+                            is_marigold_cached = True
+                            break
+            except Exception:
+                pass
+
+            if not is_marigold_cached and not os.path.exists(model_path):
+                if progress_callback:
+                    progress_callback("Downloading Marigold Normals weights (~1.4 GB) from Hugging Face... (one-time download)")
+            else:
+                if progress_callback:
+                    progress_callback("Loading Marigold Normals Pipeline...")
+
             try:
                 device = "cuda" if torch.cuda.is_available() else "cpu"
                 dtype = torch.float16 if device == "cuda" else torch.float32
@@ -598,8 +637,6 @@ class AIMaskGenerator:
                 
                 pipe = None
                 import time
-                
-                model_path = _get_local_model_path("prs-eth/marigold-normals-v1-1")
                 
                 for attempt in range(3):
                     try:
@@ -615,8 +652,12 @@ class AIMaskGenerator:
                         time.sleep(3)
             except Exception as e:
                 import traceback
-                with open("ai_error_marigold.txt", "w") as f:
-                    f.write(traceback.format_exc())
+                err_path = os.path.join(tempfile.gettempdir(), "ai_error_marigold.txt")
+                try:
+                    with open(err_path, "w", encoding="utf-8") as f:
+                        f.write(traceback.format_exc())
+                except Exception:
+                    pass
                 raise
                 
             self.models['marigold_normals'] = pipe

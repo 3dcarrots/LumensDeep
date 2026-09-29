@@ -55,7 +55,8 @@ class AIDenoiseWorker(QThread):
             denoiser = RawDenoiser(
                 model_path=self.model_path,
                 tile_size=self.tile_size,
-                overlap=64
+                overlap=64,
+                status_callback=self.status_updated.emit
             )
             model_label = f"NAFNet Ultra (width64)" if getattr(denoiser, 'width', 32) == 64 else f"NAFNet (width32)"
             self.status_updated.emit(f"Running {model_label} AI Noise Reduction...")

@@ -19,16 +19,36 @@ import gc
 import sys
 import logging
 import platform
+import tempfile
 from dataclasses import dataclass, field
-from typing import List, Tuple, Optional, Dict, Any, Union
+from typing import List, Tuple, Optional, Dict, Any, Union, Callable
 import numpy as np
 import cv2
 
+# Static imports for PyInstaller frozen bundle discovery
+try:
+    import transformers.models.depth_anything.modeling_depth_anything
+    import transformers.models.depth_anything.configuration_depth_anything
+except ImportError:
+    pass
+
 logger = logging.getLogger("AdaptiveDepthAnything")
 if not logger.handlers:
-    handler = logging.StreamHandler(sys.stdout)
-    handler.setFormatter(logging.Formatter("[%(levelname)s] (AdaptiveDepth) %(message)s"))
-    logger.addHandler(handler)
+    # PyInstaller with console=False sets sys.stdout/stderr to None
+    stream = sys.stdout if sys.stdout is not None else sys.stderr
+    if stream is not None:
+        handler = logging.StreamHandler(stream)
+        handler.setFormatter(logging.Formatter("[%(levelname)s] (AdaptiveDepth) %(message)s"))
+        logger.addHandler(handler)
+    # Always log to temp file for troubleshooting frozen builds
+    try:
+        log_dir = os.path.join(tempfile.gettempdir(), "lumensdeep")
+        os.makedirs(log_dir, exist_ok=True)
+        f_handler = logging.FileHandler(os.path.join(log_dir, "adaptive_depth.log"), encoding="utf-8")
+        f_handler.setFormatter(logging.Formatter("[%(asctime)s] [%(levelname)s] (AdaptiveDepth) %(message)s"))
+        logger.addHandler(f_handler)
+    except Exception:
+        pass
 logger.setLevel(logging.INFO)
 
 # Check for ONNX Runtime
@@ -40,8 +60,9 @@ except ImportError:
 # Check for PyTorch
 try:
     import torch
-except ImportError:
+except Exception as e:
     torch = None
+    logger.error(f"[ERROR] Failed to import PyTorch: {e}")
 
 # Check for TensorRT
 try:
@@ -181,7 +202,8 @@ class AdaptiveDepthAnything:
         onnx_path: Optional[str] = None,
         disable_gpu: bool = False,
         hardware_mode: str = "Auto",
-        input_size: Tuple[int, int] = (518, 518)
+        input_size: Tuple[int, int] = (518, 518),
+        progress_callback: Optional[Callable[[str], None]] = None,
     ):
         """
         :param model_id: HuggingFace model repo ID or local checkpoint path
@@ -190,6 +212,7 @@ class AdaptiveDepthAnything:
         :param disable_gpu: If True, completely bypasses GPU drivers and runs in safe CPU mode
         :param hardware_mode: "Auto", "TensorRT", "CUDA", "DirectML", "CoreML", or "CPU"
         :param input_size: Fixed internal resolution (Height, Width), default 518x518
+        :param progress_callback: Optional callback to notify UI of download / backend loading progress
         """
         self.model_id = model_id
         self.engine_path = engine_path
@@ -197,6 +220,7 @@ class AdaptiveDepthAnything:
         self.disable_gpu = disable_gpu
         self.hardware_mode = hardware_mode
         self.input_size = input_size
+        self.progress_callback = progress_callback
 
         self.caps = detect_device_capabilities()
         self.active_backend: str = "None"
@@ -214,14 +238,37 @@ class AdaptiveDepthAnything:
 
         self._initialize_backend()
 
+    def _check_and_notify_download(self):
+        """Notify user if DepthAnythingV2 weights must be downloaded from Hugging Face."""
+        if os.path.isdir(self.model_id) or os.path.isfile(self.model_id):
+            return
+
+        try:
+            from pathlib import Path
+            from huggingface_hub.constants import HF_HUB_CACHE
+            folder_name = "models--" + self.model_id.replace("/", "--")
+            cache_dir = Path(HF_HUB_CACHE) / folder_name / "snapshots"
+            if cache_dir.exists():
+                for snap in cache_dir.iterdir():
+                    if (snap / "model.safetensors").exists() or (snap / "pytorch_model.bin").exists():
+                        return
+        except Exception:
+            pass
+
+        if self.progress_callback:
+            self.progress_callback("Downloading DepthAnythingV2 weights (~1.3 GB) from Hugging Face... Please wait.")
+
     def _initialize_backend(self):
         """Dynamically select and initialize the optimal execution backend."""
         logger.info(f"Initializing AdaptiveDepthAnything with mode='{self.hardware_mode}', disable_gpu={self.disable_gpu}")
-        
+        self._check_and_notify_download()
+
+        failures: List[str] = []
+
         # 0. User explicitly disabled GPU (Safe Mode / CPU Only)
         if self.disable_gpu or self.hardware_mode == "CPU":
-            logger.info("🔒 GPU processing disabled by user setting. Using CPU Safe Mode.")
-            self._init_cpu_backend("CPU Safe Mode (User Requested)")
+            logger.info("[SAFE] GPU processing disabled by user setting. Using CPU Safe Mode.")
+            self._init_cpu_backend("CPU Safe Mode (User Requested)", failures)
             return
 
         # 1. Attempt TensorRT Engine / NvDepthAnythingV2 (NVIDIA GPU)
@@ -235,11 +282,14 @@ class AdaptiveDepthAnything:
                     logger.info(f"[OK] Active backend: {self.backend_description}")
                     return
                 except Exception as e:
+                    failures.append(f"TensorRT failed: {e}")
                     logger.warning(f"TensorRT initialization failed: {e}. Falling back to PyTorch CUDA...")
 
         # 2. Attempt PyTorch CUDA FP16 (NVIDIA GPU)
         if self.hardware_mode in ["Auto", "CUDA", "TensorRT"] and self.caps.cuda_available and torch is not None:
             try:
+                if self.progress_callback:
+                    self.progress_callback(f"Loading DepthAnythingV2 CUDA FP16 ({self.caps.gpu_name})...")
                 logger.info(f"Attempting PyTorch CUDA FP16 initialization on '{self.caps.gpu_name}'...")
                 self._init_pytorch_cuda_backend()
                 self.active_backend = "CUDA_FP16"
@@ -247,6 +297,7 @@ class AdaptiveDepthAnything:
                 logger.info(f"[OK] Active backend: {self.backend_description}")
                 return
             except Exception as e:
+                failures.append(f"PyTorch CUDA FP16 failed: {e}")
                 logger.warning(f"PyTorch CUDA FP16 initialization failed: {e}. Falling back...")
 
         # 3. Attempt ONNX Runtime with DirectML (AMD / Intel / Windows)
@@ -259,6 +310,7 @@ class AdaptiveDepthAnything:
                     logger.info(f"[OK] Active backend: {self.backend_description}")
                     return
             except Exception as e:
+                failures.append(f"DirectML failed: {e}")
                 logger.warning(f"DirectML initialization failed: {e}. Falling back...")
 
         # 4. Attempt ONNX Runtime with CoreML (Apple Silicon)
@@ -271,10 +323,11 @@ class AdaptiveDepthAnything:
                     logger.info(f"[OK] Active backend: {self.backend_description}")
                     return
             except Exception as e:
+                failures.append(f"CoreML failed: {e}")
                 logger.warning(f"CoreML initialization failed: {e}. Falling back...")
 
         # 5. Final Fallback: Standard CPU
-        self._init_cpu_backend("Standard CPU (Fallback)")
+        self._init_cpu_backend("Standard CPU (Fallback)", failures)
 
     def _init_tensorrt_backend(self):
         """Load and deserialize TensorRT execution engine."""
@@ -317,9 +370,11 @@ class AdaptiveDepthAnything:
         self.ort_session = ort.InferenceSession(self.onnx_path, sess_options=opts, providers=providers)
         return True
 
-    def _init_cpu_backend(self, reason: str = "CPU"):
+    def _init_cpu_backend(self, reason: str = "CPU", failures: Optional[List[str]] = None):
         """Initialize safe CPU execution engine."""
-        logger.info(f"⚙️ Initializing CPU backend ({reason})...")
+        logger.info(f"[CPU] Initializing CPU backend ({reason})...")
+        if self.progress_callback:
+            self.progress_callback(f"Loading DepthAnythingV2 on CPU ({reason})...")
         
         # Prefer PyTorch CPU if available
         if torch is not None:
@@ -333,18 +388,29 @@ class AdaptiveDepthAnything:
                 self.backend_description = f"PyTorch Multi-threaded CPU ({reason})"
                 return
             except Exception as e:
-                logger.debug(f"Failed to load PyTorch CPU model: {e}")
+                if failures is not None:
+                    failures.append(f"PyTorch CPU failed: {e}")
+                logger.warning(f"Failed to load PyTorch CPU model: {e}")
 
         # Try ONNX CPU
         if ort is not None and self.onnx_path and os.path.exists(self.onnx_path):
-            opts = ort.SessionOptions()
-            opts.intra_op_num_threads = min(8, os.cpu_count() or 4)
-            self.ort_session = ort.InferenceSession(self.onnx_path, sess_options=opts, providers=["CPUExecutionProvider"])
-            self.active_backend = "ONNX_CPU"
-            self.backend_description = f"ONNX CPU ({reason})"
-            return
+            try:
+                opts = ort.SessionOptions()
+                opts.intra_op_num_threads = min(8, os.cpu_count() or 4)
+                self.ort_session = ort.InferenceSession(self.onnx_path, sess_options=opts, providers=["CPUExecutionProvider"])
+                self.active_backend = "ONNX_CPU"
+                self.backend_description = f"ONNX CPU ({reason})"
+                return
+            except Exception as e:
+                if failures is not None:
+                    failures.append(f"ONNX CPU failed: {e}")
+                logger.warning(f"Failed to load ONNX CPU model: {e}")
 
-        raise RuntimeError("Failed to initialize any DepthAnythingV2 inference backend.")
+        if failures is not None and torch is None:
+            failures.append("PyTorch runtime is unavailable (failed to import 'torch').")
+
+        err_details = "\n• " + "\n• ".join(failures) if failures else "No backend was compatible."
+        raise RuntimeError(f"Failed to initialize any DepthAnythingV2 inference backend.\nDetails:\n{err_details}")
 
     def preprocess(self, image_np: np.ndarray) -> np.ndarray:
         """

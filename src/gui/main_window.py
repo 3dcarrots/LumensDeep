@@ -1932,10 +1932,27 @@ class PhotoEditorWindow(QMainWindow):
         self.flip_90 = self.engine.flip_90
         self._update_view()
 
-    def _toggle_wb_picker_from_tb(self, checked):
+    def _toggle_wb_picker(self, checked: bool):
         self.image_label.is_picking_wb = checked
-        if checked: self.image_label.setCursor(Qt.CrossCursor)
-        else: self.image_label.unsetCursor()
+        if hasattr(self, 'btn_tb_wb_pick') and self.btn_tb_wb_pick.isChecked() != checked:
+            self.btn_tb_wb_pick.blockSignals(True)
+            self.btn_tb_wb_pick.setChecked(checked)
+            self.btn_tb_wb_pick.blockSignals(False)
+        if checked:
+            if getattr(self.image_label, 'is_picking_focus', False):
+                self._toggle_focus_picker(False)
+            if getattr(self.image_label, 'is_painting_mask', False):
+                self._toggle_brush_from_tb(False)
+            if getattr(self.image_label, 'is_picking_mask', False):
+                self._toggle_mask_picker(False)
+            self.image_label.setCursor(Qt.CrossCursor)
+            self.statusBar().showMessage("🎯 Click on a neutral white or gray point on the photo (Right-Click or Esc to cancel)...")
+        else:
+            self.image_label.unsetCursor()
+            self.statusBar().showMessage("Ready")
+
+    def _toggle_wb_picker_from_tb(self, checked):
+        self._toggle_wb_picker(checked)
 
     def _toggle_focus_picker(self, checked):
         self.image_label.is_picking_focus = checked
@@ -1949,10 +1966,17 @@ class PhotoEditorWindow(QMainWindow):
                 self.dock_global.btn_pick_focus.setChecked(checked)
                 self.dock_global.btn_pick_focus.blockSignals(False)
         if checked:
+            if getattr(self.image_label, 'is_picking_wb', False):
+                self._toggle_wb_picker(False)
+            if getattr(self.image_label, 'is_painting_mask', False):
+                self._toggle_brush_from_tb(False)
+            if getattr(self.image_label, 'is_picking_mask', False):
+                self._toggle_mask_picker(False)
             self.image_label.setCursor(Qt.CrossCursor)
             self.statusBar().showMessage("🎯 Click on any point on the photo (e.g. eye or face) to set 3D Focal Depth...")
         else:
             self.image_label.unsetCursor()
+            self.statusBar().showMessage("Ready")
 
     def _toggle_focus_picker_from_tb(self, checked):
         self._toggle_focus_picker(checked)
@@ -1968,8 +1992,16 @@ class PhotoEditorWindow(QMainWindow):
     def _toggle_brush_from_tb(self, checked):
         self.image_label.is_painting_mask = checked
         self.brush_settings_bar.setVisible(checked)
-        if checked: self.image_label.setCursor(Qt.BlankCursor)
-        else: self.image_label.unsetCursor()
+        if checked:
+            if getattr(self.image_label, 'is_picking_wb', False):
+                self._toggle_wb_picker(False)
+            if getattr(self.image_label, 'is_picking_focus', False):
+                self._toggle_focus_picker(False)
+            if getattr(self.image_label, 'is_picking_mask', False):
+                self._toggle_mask_picker(False)
+            self.image_label.setCursor(Qt.BlankCursor)
+        else:
+            self.image_label.unsetCursor()
 
     def _clear_brush_mask(self):
         self.engine.clear_brush_mask()
@@ -1977,8 +2009,22 @@ class PhotoEditorWindow(QMainWindow):
 
     def _toggle_mask_picker(self, checked):
         self.image_label.is_picking_mask = checked
-        if checked: self.image_label.setCursor(Qt.CrossCursor)
-        else: self.image_label.unsetCursor()
+        if hasattr(self, 'dock_mask') and hasattr(self.dock_mask, 'btn_pick_mask') and self.dock_mask.btn_pick_mask.isChecked() != checked:
+            self.dock_mask.btn_pick_mask.blockSignals(True)
+            self.dock_mask.btn_pick_mask.setChecked(checked)
+            self.dock_mask.btn_pick_mask.blockSignals(False)
+        if checked:
+            if getattr(self.image_label, 'is_picking_wb', False):
+                self._toggle_wb_picker(False)
+            if getattr(self.image_label, 'is_picking_focus', False):
+                self._toggle_focus_picker(False)
+            if getattr(self.image_label, 'is_painting_mask', False):
+                self._toggle_brush_from_tb(False)
+            self.image_label.setCursor(Qt.CrossCursor)
+            self.statusBar().showMessage("🎯 Click on the photo to sample target mask color...")
+        else:
+            self.image_label.unsetCursor()
+            self.statusBar().showMessage("Ready")
 
     # --- Parameter Handlers ---
     def update_engine_from_ui(self):
@@ -2177,17 +2223,50 @@ class PhotoEditorWindow(QMainWindow):
         self.dock_mask.slider_mask_luma_t.setValue(int(v * 100))
         self._toggle_mask_picker(False)
 
-    def apply_picked_wb_color(self, r, g, b):
+    def apply_picked_wb_color(self, r: float, g: float, b: float):
         avg = (r + g + b) / 3.0
-        if avg > 0.001:
-            dr = (avg - r) / avg
-            db = (avg - b) / avg
-            temp_shift = int(np.clip((dr - db) * 100, -100, 100))
-            tint_shift = int(np.clip(((avg - g) / avg) * 100, -100, 100))
-            if hasattr(self, 'slider_temperature') and self.slider_exposure:
-                self.slider_temperature.setValue(temp_shift)
-                self.slider_tint.setValue(tint_shift)
-        self._toggle_wb_picker_from_tb(False)
+        if avg <= 0.001 or (r + b) <= 0.0001:
+            self.statusBar().showMessage("⚠️ Picked area is too dark for White Balance. Click a brighter neutral area.", 4000)
+            self._toggle_wb_picker(False)
+            return
+
+        # Mathematically exact White Balance solver for the engine shader:
+        # rgb.r *= max(0.0, 1.0 + (temp / 100.0) * 0.5)
+        # rgb.b *= max(0.0, 1.0 - (temp / 100.0) * 0.5)
+        # rgb.g *= max(0.0, 1.0 - (tint / 100.0) * 0.5)
+        # Solving for r' = b':
+        # r * (1 + 0.5 * T) = b * (1 - 0.5 * T) => 0.5 * T * (r + b) = b - r => T = 2 * (b - r) / (r + b)
+        # Since slider value = T * 100: temp_val = 200 * (b - r) / (r + b)
+        temp_val = int(np.clip(round(200.0 * (b - r) / max(0.0001, r + b)), -200, 200))
+
+        # Target neutral luminance matching R and B:
+        r_target = r * max(0.0, 1.0 + (temp_val / 200.0))
+        # Solving for g' = r_target:
+        # g * (1 - 0.5 * M) = r_target => 0.5 * M = 1 - r_target / g => M = 2 * (g - r_target) / g
+        # Since slider value = M * 100: tint_val = 200 * (g - r_target) / g
+        tint_val = int(np.clip(round(200.0 * (g - r_target) / max(0.0001, g)), -100, 100))
+
+        # Find the Basic Adjustments sliders
+        slider_temp = getattr(self, 'slider_temperature', None)
+        slider_tint = getattr(self, 'slider_tint', None)
+        if slider_temp is None or slider_tint is None:
+            ba = self.plugin_manager.get_plugin('basic_adjustments') if hasattr(self, 'plugin_manager') else None
+            if ba and hasattr(ba, '_sliders'):
+                slider_temp = ba._sliders.get('temperature')
+                slider_tint = ba._sliders.get('tint')
+                self.slider_temperature = slider_temp
+                self.slider_tint = slider_tint
+
+        if slider_temp is not None and slider_tint is not None:
+            slider_temp.setValue(temp_val)
+            slider_tint.setValue(tint_val)
+            self._on_layer_parameter_changed()
+            self._update_view()
+            self.statusBar().showMessage(
+                f"🎯 WB set: Temp {temp_val:+d}, Tint {tint_val:+d} (Neutral sample: R={r:.3f}, G={g:.3f}, B={b:.3f})",
+                4000
+            )
+        self._toggle_wb_picker(False)
 
     @staticmethod
     def _rgb_to_hsv(r, g, b):
@@ -5649,6 +5728,9 @@ class PhotoEditorWindow(QMainWindow):
                 self.stop_ai_auto_correct()
                 return
             if self.image_label.is_cropping: self.viewport_toolbar.btn_tb_crop_tool.setChecked(False)
+            if getattr(self.image_label, 'is_picking_wb', False): self._toggle_wb_picker(False)
+            if getattr(self.image_label, 'is_picking_focus', False): self._toggle_focus_picker(False)
+            if getattr(self.image_label, 'is_picking_mask', False): self._toggle_mask_picker(False)
         elif key == Qt.Key_V: self.viewport_toolbar.btn_tb_split_v.toggle()
         elif key == Qt.Key_H: self.viewport_toolbar.btn_tb_split_h.toggle()
         elif key == Qt.Key_B: self.viewport_toolbar.btn_tb_side_by_side.toggle()

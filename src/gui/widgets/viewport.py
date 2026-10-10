@@ -337,8 +337,26 @@ class ImagePreviewLabel(QLabel):
                             self.is_dragging_split = True
                             return
 
-            if self.is_picking_mask or self.is_picking_wb or self.is_picking_focus:
+            if event.button() == Qt.MouseButton.RightButton:
+                # Right-click cancels any active picker tool
+                if self.is_picking_wb:
+                    if hasattr(self.main_window, '_toggle_wb_picker'):
+                        self.main_window._toggle_wb_picker(False)
+                    elif hasattr(self.main_window, '_toggle_wb_picker_from_tb'):
+                        self.main_window._toggle_wb_picker_from_tb(False)
+                    return
+                if self.is_picking_focus:
+                    if hasattr(self.main_window, '_toggle_focus_picker'):
+                        self.main_window._toggle_focus_picker(False)
+                    return
+                if self.is_picking_mask:
+                    if hasattr(self.main_window, '_toggle_mask_picker'):
+                        self.main_window._toggle_mask_picker(False)
+                    return
+
+            if (self.is_picking_mask or self.is_picking_wb or self.is_picking_focus) and event.button() == Qt.MouseButton.LeftButton:
                 self._handle_picking(event)
+                return
             elif self.is_painting_mask:
                 self.last_brush_uv = None
                 self._handle_brush_draw(event, is_press=True)
@@ -350,7 +368,9 @@ class ImagePreviewLabel(QLabel):
         except ImportError:
             from ... import mcp_server
             state = mcp_server.state
-        if not state.image_loaded or not hasattr(self.main_window, 'engine'):
+        has_engine = hasattr(self.main_window, 'engine') and self.main_window.engine is not None
+        has_image = getattr(state, 'image_loaded', False) or (has_engine and getattr(self.main_window.engine, 'texture', None) is not None)
+        if not has_image or not has_engine:
             return
         px, py = event.position().x(), event.position().y()
         pm = self.pixmap()
@@ -362,15 +382,16 @@ class ImagePreviewLabel(QLabel):
             img_py = py - y_offset
             if 0 <= img_px <= pm_w and 0 <= img_py <= pm_h:
                 u, v = self.main_window.engine.get_uv_from_viewport(img_px, img_py, pm_w, pm_h)
-                r, g, b = self.main_window.engine.pick_color_at(u, v)
-                if self.is_picking_mask:
-                    self.main_window.apply_picked_mask_color(r, g, b)
-                elif self.is_picking_wb:
-                    self.main_window.apply_picked_wb_color(r, g, b)
-                elif self.is_picking_focus:
+                if self.is_picking_focus:
                     cached_d = getattr(self.main_window, '_cached_depth_np', None)
                     z_lin = self.main_window.engine.pick_depth_at(u, v, cached_d)
                     self.main_window.apply_picked_focus_depth(z_lin, u, v)
+                else:
+                    r, g, b = self.main_window.engine.pick_color_at(u, v)
+                    if self.is_picking_mask:
+                        self.main_window.apply_picked_mask_color(r, g, b)
+                    elif self.is_picking_wb:
+                        self.main_window.apply_picked_wb_color(r, g, b)
 
     def mouseMoveEvent(self, event):
         self.hover_pos = event.position()

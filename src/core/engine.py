@@ -1959,23 +1959,47 @@ class PhotoEngine:
         mask_u8 = (np.clip(mask_f32, 0.0, 1.0) * 255.0).astype(np.uint8)
         tex.write(mask_u8.tobytes())
 
-    def pick_color_at(self, u: float, v: float) -> tuple[float, float, float]:
-        if not hasattr(self, 'raw_fbo') or not self.raw_fbo: return (0.0, 0.0, 0.0)
-        # Convert u, v to pixel coordinates
-        px = int(u * self.width)
-        py = int(v * self.height)
-        px = max(0, min(self.width - 1, px))
-        py = max(0, min(self.height - 1, py))
-        
-        # Read a 1x1 area
+    def pick_color_at(self, u: float, v: float, sample_radius: int = 2) -> tuple[float, float, float]:
+        """
+        Samples the linear RGB color at normalized image coordinates (u, v) in range [0.0, 1.0].
+        v=1.0 is top, v=0.0 is bottom.
+        Takes a median neighborhood patch (default 5x5) to eliminate sensor noise / hot pixels.
+        Returns linear (r, g, b) float tuple.
+        """
+        tex = getattr(self, 'texture', None)
+        if tex is None or self.width <= 0 or self.height <= 0:
+            return (0.0, 0.0, 0.0)
+
+        import numpy as np
+
+        px = int(np.clip(u * self.width, 0, self.width - 1))
+        py = int(np.clip(v * self.height, 0, self.height - 1))
+
+        r_pad = max(0, sample_radius)
+        x0 = max(0, px - r_pad)
+        y0 = max(0, py - r_pad)
+        x1 = min(self.width, px + r_pad + 1)
+        y1 = min(self.height, py + r_pad + 1)
+        box_w = max(1, x1 - x0)
+        box_h = max(1, y1 - y0)
+
+        fbo = None
         try:
-            import struct
-            data = self.raw_fbo.read(viewport=(px, py, 1, 1), components=4, dtype='f4')
-            r, g, b, a = struct.unpack('4f', data)
-            return (r, g, b)
+            fbo = self.ctx.framebuffer(color_attachments=[tex])
+            data = fbo.read(viewport=(x0, y0, box_w, box_h), components=4, dtype='f4')
+            arr = np.frombuffer(data, dtype=np.float32).reshape((box_h, box_w, 4))
+            med = np.nanmedian(arr[:, :, :3], axis=(0, 1))
+            med = np.maximum(0.0, med)
+            return (float(med[0]), float(med[1]), float(med[2]))
         except Exception as e:
             print(f"Error picking color: {e}")
             return (0.0, 0.0, 0.0)
+        finally:
+            if fbo is not None:
+                try:
+                    fbo.release()
+                except Exception:
+                    pass
 
     def pick_depth_at(self, u: float, v: float, cached_depth_np=None, sample_radius: int = 4) -> float:
         """
